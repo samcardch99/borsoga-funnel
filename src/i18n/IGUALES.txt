@@ -1,0 +1,89 @@
+# Claves cuya traducción correcta es quedarse igual: nombres propios, marcas,
+# números y palabras que coinciden en los dos idiomas. El build las descuenta
+# del aviso de "sin traducir", así que una clave nueva que salga idéntica por
+# descuido sí se cantará.
+Architectural Visualization
+Architectural visualization
+Borsoga
+Borsoga Edition
+Borsoga Immersive
+Borsoga LLC · Miami, Florida
+Borsoga Studio
+Brand · Social · Marketing
+Branding
+Edition
+Essential
+Essential · Premium · Edition
+Extra 01
+Extra 02
+Extra 03
+Extra 04
+Extras
+Florida
+HOA
+Home office
+Interior Design
+Interior design
+Material
+Miami-Dade
+No
+PLAN 01
+PLAN 02
+PLAN 03
+Penthouse
+Plan
+Plan 01
+Plan 02
+Plan 03
+Premium
+Retail
+Showroom
+Tour 360
+av_extra_03
+av_extra_04
+av_eyebrow
+av_form_edition
+av_form_essential
+av_form_immersive
+av_form_premium
+av_form_tour
+av_renders
+borsoga
+borsoga_edition
+borsoga_immersive
+borsoga_llc_miami_florida
+brand_social_marketing
+edition
+essential
+essential_premium_edition
+extra_01
+extra_02
+extras
+interior_design
+plan_01
+plan_01_2
+plan_02
+plan_02_2
+plan_03
+plan_03_2
+plan_badge
+premium
+renders
+srv_eyebrow
+srv_footer
+srv_meta_place
+srv_n1
+srv_n2
+srv_n3
+srv_n4
+srv_name1
+srv_name2
+srv_name3
+srv_proof_l1
+srv_proof_l2
+srv_proof_l3
+sum_extras
+sum_hoa
+sum_material
+sum_plan
+tour_360

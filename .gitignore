@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+node_modules/
+.vercel/
+build/
+*.zip
+.vercel
+.env*
+
+# Paquetes de skills que instala el tooling local, no son del proyecto
+.agents/
+.claude/
