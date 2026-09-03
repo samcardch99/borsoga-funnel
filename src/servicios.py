@@ -93,7 +93,8 @@ animation:bs-fall 1.6s cubic-bezier(.16,.86,.22,1) both}
 .srv-row{border-top:1px solid rgba(0,0,0,.14);padding:clamp(28px,4vw,46px) 0;display:grid;
 grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:clamp(20px,3vw,40px);align-items:start}
 .srv-head{display:flex;align-items:flex-start;gap:clamp(14px,2vw,22px);cursor:pointer;
--webkit-tap-highlight-color:transparent;background:none;border:none;text-align:left;padding:0;width:100%;font:inherit}
+-webkit-tap-highlight-color:transparent;-webkit-appearance:none;appearance:none;background:none;border:none;
+color:inherit;text-align:left;padding:0;width:100%;font:inherit}
 .srv-swap{position:relative;flex:1;min-width:0;align-self:stretch;min-height:clamp(76px,7vw,96px)}
 .srv-name,.srv-what{position:absolute;inset:0;margin:0;transition:opacity .3s ease,transform .3s ease}
 .srv-name{font-size:clamp(23px,2.9vw,34px);font-weight:600;letter-spacing:-.025em;line-height:1.08;max-width:14ch}
