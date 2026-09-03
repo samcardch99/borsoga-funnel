@@ -153,7 +153,7 @@ ul{margin:0;padding:0;list-style:none}
 summary{cursor:pointer;list-style:none}
 summary::-webkit-details-marker{display:none}
 summary::marker{content:''}
-button{font-family:inherit;cursor:pointer}
+button{font-family:inherit;cursor:pointer;color:inherit}
 img{max-width:100%}
 /* El navegador oculta [hidden] con `display:none`, pero cualquier `display`
    escrito en el atributo style gana por especificidad y el elemento se sigue

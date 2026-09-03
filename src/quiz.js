@@ -734,7 +734,9 @@ function render() {
   // Nunca deshabilitado por campos pendientes: pulsarlo es lo que revela qué
   // falta. Un botón gris no explica nada; solo deja al usuario atascado.
   next.disabled = S.sending;
-  next.textContent = S.sending ? (S.notice || 'Enviando…') : (S.step === 6 ? 'Enviar mi proyecto' : 'Continuar');
+  var nextLabel = S.sending ? (S.notice || 'Enviando…') : (S.step === 6 ? 'Enviar mi proyecto' : 'Continuar');
+  next.querySelector('.q-btn-label').textContent = nextLabel;
+  next.setAttribute('aria-label', nextLabel);
   var aviso = document.getElementById('q-aviso');
   if (S.showErrors && MISSING.length) {
     aviso.textContent = MISSING.length === 1 ? 'Falta 1 respuesta' : 'Faltan ' + MISSING.length + ' respuestas';
@@ -859,7 +861,10 @@ function submit() {
             function (pct) {
               S.notice = 'Subiendo ' + (hechos + 1) + ' de ' + pending.length + ' · ' + pct + '%';
               var n = document.getElementById('q-next');
-              if (n) n.textContent = S.notice;
+              if (n) {
+                n.querySelector('.q-btn-label').textContent = S.notice;
+                n.setAttribute('aria-label', S.notice);
+              }
             })
             .then(function (b) {
               hechos++;

@@ -56,8 +56,12 @@ align-items:center;gap:18px;cursor:pointer;flex-wrap:wrap;width:100%}
 .q-drop input{position:absolute;width:1px;height:1px;opacity:0}
 .q-file{display:flex;gap:10px;font-size:14px;color:rgba(0,0,0,.65);padding:7px 0}
 .q-nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid rgba(0,0,0,.14);z-index:30}
+.q-nav{transition:transform .25s ease,visibility .25s ease}
+.q-nav.q-at-footer{transform:translateY(100%);visibility:hidden;pointer-events:none}
 .q-nav-in{width:min(100%,1080px);margin:0 auto;padding:16px clamp(20px,4vw,40px);display:flex;
 align-items:center;justify-content:space-between;gap:16px}
+.q-nav-group{display:flex;align-items:center;gap:20px;min-width:0}
+.q-nav-icon{display:none}
 .q-back{background:none;border:none;font-size:11px;font-weight:600;letter-spacing:.12em;
 text-transform:uppercase;padding:8px 0;cursor:pointer;border-bottom:1px solid #000}
 .q-back:disabled{color:rgba(0,0,0,.22);border-bottom-color:transparent;cursor:default}
@@ -91,7 +95,62 @@ display:flex;align-items:center;gap:7px}
 }
 .q-slot{aspect-ratio:4/3;background:rgba(0,0,0,.04);display:flex;align-items:center;
 justify-content:center;font-size:12px;color:rgba(0,0,0,.32);letter-spacing:.08em;text-transform:uppercase}
+@media (max-width:640px){
+  .q-main{padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+  .q-nav-in{padding:9px 12px calc(9px + env(safe-area-inset-bottom,0px));gap:8px}
+  .q-nav-group{gap:8px}
+  .q-nav-status{flex:1;justify-content:flex-end}
+  .q-back,.q-next{width:42px;height:42px;min-width:42px;padding:0;border:1px solid rgba(0,0,0,.18);
+    display:inline-flex;align-items:center;justify-content:center}
+  .q-back{background:#fff}
+  .q-back:disabled{border-color:rgba(0,0,0,.08)}
+  .q-next{background:#000;border-color:#000}
+  .q-nav-icon{width:19px;height:19px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;
+    stroke-linecap:round;stroke-linejoin:round}
+  .q-btn-label{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;
+    clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  #q-count{display:none}
+  #q-aviso{font-size:10px!important;line-height:1.2;max-width:12ch;text-align:right}
+}
 """
+
+
+def quiz_nav():
+    """Barra común de ambos configuradores; texto accesible, iconos en móvil."""
+    return f"""<div class="q-nav" id="q-nav" hidden>
+<div class="q-nav-in">
+<div class="q-nav-group">
+<button class="q-back" id="q-back" type="button" aria-label="{t('q_back')}">
+<svg class="q-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+<span class="q-btn-label">{t('q_back')}</span></button>
+<button class="q-back" id="q-save" type="button" aria-label="{t('q_save')}" style="border-bottom-color:rgba(0,0,0,.25)">
+<svg class="q-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h10l2 2v14H6z"/><path d="M9 4v6h6V4M9 20v-6h6v6"/></svg>
+<span class="q-btn-label">{t('q_save')}</span></button>
+</div>
+<div class="q-nav-group q-nav-status">
+<span id="q-aviso" hidden style="font-size:12px;font-weight:600;letter-spacing:.04em;color:#b42318"></span>
+<span id="q-count" style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,0,0,.45)"></span>
+<button class="q-next" id="q-next" type="button" aria-label="Continuar">
+<svg class="q-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+<span class="q-btn-label">Continuar</span></button>
+</div>
+</div>
+</div>"""
+
+
+QUIZ_FOOTER_JS = """<script>
+(function () {
+  function boot() {
+    var nav = document.getElementById('q-nav'), foot = document.querySelector('footer');
+    if (!nav || !foot || !('IntersectionObserver' in window)) return;
+    new IntersectionObserver(function (entries) {
+      nav.classList.toggle('q-at-footer', entries[0].isIntersecting);
+    }, { threshold: 0.01 }).observe(foot);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once:true });
+  else boot();
+})();
+</script>"""
 
 
 QUIZ_JS = ("<script>\n" +
@@ -129,22 +188,9 @@ def page():
 {t("q_nojs_2")}</p></noscript>
 </main>
 
-<div class="q-nav" id="q-nav" hidden>
-<div class="q-nav-in">
-<div style="display:flex;align-items:center;gap:20px">
-<button class="q-back" id="q-back" type="button">{t("q_back")}</button>
-<button class="q-back" id="q-save" type="button" style="border-bottom-color:rgba(0,0,0,.25)">{t("q_save")}</button>
-</div>
-<div style="display:flex;align-items:center;gap:18px">
-<span id="q-aviso" hidden style="font-size:12px;font-weight:600;letter-spacing:.04em;color:#b42318"></span>
-<span id="q-count" style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,0,0,.45)"></span>
-<button class="q-next" id="q-next" type="button">Continuar</button>
-</div>
-</div>
-</div>
+{quiz_nav()}
 </div>
 {QUIZ_JS}
+{QUIZ_FOOTER_JS}
 """
     return h + footer().replace("</main>\n", "")
-
-

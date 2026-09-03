@@ -8,7 +8,7 @@ significado que se desincronizaran a la primera.
 import os
 from i18n_load import t
 from shell import bundle_i18n, head, footer
-from quiz import QUIZ_CSS
+from quiz import QUIZ_CSS, QUIZ_FOOTER_JS, quiz_nav
 
 # El diseño de AV invierte la selección a negro, y sube los steppers a 44px
 # (objetivo táctil). El de interiorismo no: por eso van como override y no
@@ -61,19 +61,7 @@ def page():
 {t("q_nojs_2")}</p></noscript>
 </main>
 
-<div class="q-nav" id="q-nav" hidden>
-<div class="q-nav-in">
-<div style="display:flex;align-items:center;gap:20px">
-<button class="q-back" id="q-back" type="button">{t("q_back")}</button>
-<button class="q-back" id="q-save" type="button" style="border-bottom-color:rgba(0,0,0,.25)">{t("q_save")}</button>
+""" + quiz_nav() + """
 </div>
-<div style="display:flex;align-items:center;gap:18px">
-<span id="q-aviso" hidden style="font-size:12px;font-weight:600;letter-spacing:.04em;color:#b42318"></span>
-<span id="q-count" style="font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,0,0,.45)"></span>
-<button class="q-next" id="q-next" type="button">Continuar</button>
-</div>
-</div>
-</div>
-</div>
-""" + QUIZ_JS + "\n"
+""" + QUIZ_JS + "\n" + QUIZ_FOOTER_JS + "\n"
     return h + footer().replace("</main>\n", "")
