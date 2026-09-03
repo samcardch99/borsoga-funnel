@@ -145,7 +145,7 @@ def page_web():
                      "Una sola autoría, de la idea al código.")
 
     # Mantenimiento
-    h += (f'<section style="background:rgba(0,0,0,.025)"><div style="{WRAP};'
+    h += (f'<section id="mantenimiento" style="background:rgba(0,0,0,.025);scroll-margin-top:68px"><div style="{WRAP};'
           f'padding-top:clamp(56px,8vw,104px);padding-bottom:clamp(56px,8vw,104px)">'
           + section_head("Mantenimiento", "Planes de mantenimiento opcionales",
                          "Contratables por mes o por año, de forma independiente al proyecto.")
@@ -564,8 +564,14 @@ def _copiar_assets():
     for f in sorted(os.listdir(origen)):
         if f.startswith("."):
             continue
-        shutil.copy2(os.path.join(origen, f), os.path.join(destino, f))
-    print(f"  assets/ → build/assets/ ({len(os.listdir(origen))} ficheros)")
+        src = os.path.join(origen, f)
+        dst = os.path.join(destino, f)
+        if os.path.isdir(src):
+            shutil.copytree(src, dst, dirs_exist_ok=True)
+        else:
+            shutil.copy2(src, dst)
+    total = sum(len(files) for _, _, files in os.walk(origen))
+    print(f"  assets/ → build/assets/ ({total} ficheros)")
 
 
 def main():

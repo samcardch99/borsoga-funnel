@@ -108,6 +108,8 @@ WEB_COMPARE = [
 ]
 
 WEB_CARE = [
+    ['Precio mensual', '$100 / mes', '$200 / mes'],
+    ['Precio anual · 2 meses gratis', '$1,000 / año', '$2,000 / año'],
     ['Actualizaciones y parches de seguridad', True, True],
     ['Backups automáticos', 'Semanal', 'Diario'],
     ['Monitoreo de uptime', True, True],

@@ -71,6 +71,16 @@ SERVICIOS = [("srv_n1", "srv_name1", "srv_line1", "srv_what1", "/interior-design
 PROOF = [("srv_proof_l1", "srv_proof_d1", "srv_slot_ph1"), ("srv_proof_l2", "srv_proof_d2", "srv_slot_ph2"),
          ("srv_proof_l3", "srv_proof_d3", "srv_slot_ph3"), ("srv_proof_l4", "srv_proof_d4", "srv_slot_ph4")]
 
+# Imágenes optimizadas para la cuadrícula de servicios. Cada tarjeta ocupa como
+# máximo media columna de un contenedor de 1240px; 1200px cubre pantallas retina
+# normales y 2400px conserva nitidez incluso en densidades muy altas/4K.
+PROOF_IMAGES = [
+    ("interior-design", "srv_name1", 2400, 1350),
+    ("architectural-visualization", "srv_name2", 2400, 1350),
+    ("branding", "srv_name3", 2400, 1601),
+    ("web-app", "srv_name4", 2400, 1601),
+]
+
 CSS = """
 @keyframes bs-in { from { opacity:0 } to { opacity:1 } }
 @keyframes bs-fall { from { transform:translate3d(0,-100%,0) } to { transform:none } }
@@ -403,13 +413,16 @@ def page():
 
     prueba = "".join(
         f'<div style="display:flex;flex-direction:column;gap:14px">'
-        f'<div style="width:100%;aspect-ratio:4/3;background:rgba(0,0,0,.04);display:flex;'
-        f'align-items:center;justify-content:center;text-align:center;padding:16px;font-size:12px;'
-        f'letter-spacing:.08em;text-transform:uppercase;color:rgba(0,0,0,.32)">{t(ph)}</div>'
+        f'<div style="width:100%;aspect-ratio:4/3;background:rgba(0,0,0,.04);overflow:hidden">'
+        f'<img src="/assets/services/{img}-1200.webp" '
+        f'srcset="/assets/services/{img}-1200.webp 1200w, /assets/services/{img}-2400.webp 2400w" '
+        f'sizes="(max-width:539px) calc(100vw - 40px), (max-width:1320px) calc((100vw - 96px)/2), 600px" '
+        f'alt="{t(alt)}" width="{w}" height="{ht}" loading="lazy" decoding="async" '
+        f'style="width:100%;height:100%;display:block;object-fit:cover"></div>'
         f'<div style="display:flex;flex-direction:column;gap:6px">'
         f'<div style="font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase">{t(lb)}</div>'
         f'<div style="font-size:14px;line-height:1.5;color:rgba(0,0,0,.6)">{t(d)}</div></div></div>'
-        for lb, d, ph in PROOF)
+        for (lb, d, _ph), (img, alt, w, ht) in zip(PROOF, PROOF_IMAGES))
 
     h += f"""<div style="position:relative;min-height:100vh">
 <div id="bs-curtain" aria-hidden="true"><div style="background:{CORTINA}"></div></div>

@@ -178,7 +178,14 @@ img{max-width:100%}
 .skip{position:absolute;left:-9999px}
 .skip:focus{left:12px;top:12px;z-index:99;background:#000;color:#fff;padding:12px 18px;font-size:13px}
 :focus-visible{outline:2px solid #000;outline-offset:2px}
-@media (max-width:640px){.cmp-h{top:0!important}}
+/* Un viewport 4K usado a escala nativa (3840px) conserva la densidad visual
+   del diseño a 2K (2560px): 3840 / 2560 = 1.5. En sistemas que ya escalan la
+   pantalla 4K a 1920px CSS esta regla no entra, porque allí no hace falta. */
+@media screen and (min-width:3400px){html{zoom:1.5}}
+@media (max-width:640px){
+  .cmp-h{top:0!important}
+  .nav-services{display:none!important}
+}
 """
 
 
@@ -237,7 +244,7 @@ def header(cta_label, cta_href, nav_href="#servicios"):
 <div style="{WRAP.replace('padding:0 ','padding:0 ')};height:68px;display:flex;align-items:center;justify-content:space-between;gap:24px">
 <a href="/" aria-label="{t('chrome_home')}"><img src="/assets/logo-negro.png" alt="Borsoga" width="1629" height="333" style="width:132px;height:auto;display:block"></a>
 <nav style="display:flex;align-items:center;gap:clamp(16px,3vw,32px)">
-<a href="{nav_href}" class="nav-m" style="font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,0,0,.5)">{t("chrome_nav_services")}</a>
+<a href="{nav_href}" class="nav-m nav-services" style="font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(0,0,0,.5)">{t("chrome_nav_services")}</a>
 <a href="{cta_href}" style="font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid #000;padding-bottom:2px">{T(cta_label)}</a>
 {selector_idioma()}
 </nav>
