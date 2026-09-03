@@ -56,8 +56,6 @@ align-items:center;gap:18px;cursor:pointer;flex-wrap:wrap;width:100%}
 .q-drop input{position:absolute;width:1px;height:1px;opacity:0}
 .q-file{display:flex;gap:10px;font-size:14px;color:rgba(0,0,0,.65);padding:7px 0}
 .q-nav{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid rgba(0,0,0,.14);z-index:30}
-.q-nav{transition:transform .25s ease,visibility .25s ease}
-.q-nav.q-at-footer{transform:translateY(100%);visibility:hidden;pointer-events:none}
 .q-nav-in{width:min(100%,1080px);margin:0 auto;padding:16px clamp(20px,4vw,40px);display:flex;
 align-items:center;justify-content:space-between;gap:16px}
 .q-nav-group{display:flex;align-items:center;gap:20px;min-width:0}
@@ -138,21 +136,6 @@ def quiz_nav():
 </div>"""
 
 
-QUIZ_FOOTER_JS = """<script>
-(function () {
-  function boot() {
-    var nav = document.getElementById('q-nav'), foot = document.querySelector('footer');
-    if (!nav || !foot || !('IntersectionObserver' in window)) return;
-    new IntersectionObserver(function (entries) {
-      nav.classList.toggle('q-at-footer', entries[0].isIntersecting);
-    }, { threshold: 0.01 }).observe(foot);
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot, { once:true });
-  else boot();
-})();
-</script>"""
-
-
 QUIZ_JS = ("<script>\n" +
             open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "quiz.js"),
                  encoding="utf-8").read() +
@@ -191,6 +174,5 @@ def page():
 {quiz_nav()}
 </div>
 {QUIZ_JS}
-{QUIZ_FOOTER_JS}
 """
     return h + footer().replace("</main>\n", "")

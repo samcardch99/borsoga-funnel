@@ -8,7 +8,7 @@ significado que se desincronizaran a la primera.
 import os
 from i18n_load import t
 from shell import bundle_i18n, head, footer
-from quiz import QUIZ_CSS, QUIZ_FOOTER_JS, quiz_nav
+from quiz import QUIZ_CSS, quiz_nav
 
 # El diseño de AV invierte la selección a negro, y sube los steppers a 44px
 # (objetivo táctil). El de interiorismo no: por eso van como override y no
@@ -63,5 +63,5 @@ def page():
 
 """ + quiz_nav() + """
 </div>
-""" + QUIZ_JS + "\n" + QUIZ_FOOTER_JS + "\n"
+""" + QUIZ_JS + "\n"
     return h + footer().replace("</main>\n", "")
