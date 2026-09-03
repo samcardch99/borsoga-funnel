@@ -75,10 +75,10 @@ PROOF = [("srv_proof_l1", "srv_proof_d1", "srv_slot_ph1"), ("srv_proof_l2", "srv
 # máximo media columna de un contenedor de 1240px; 1200px cubre pantallas retina
 # normales y 2400px conserva nitidez incluso en densidades muy altas/4K.
 PROOF_IMAGES = [
-    ("interior-design", "srv_name1", 2400, 1350),
-    ("architectural-visualization", "srv_name2", 2400, 1350),
-    ("branding", "srv_name3", 2400, 1601),
-    ("web-app", "srv_name4", 2400, 1601),
+    ("interior-design", "srv_name1", 2400, 1350, "/interior-design/"),
+    ("architectural-visualization", "srv_name2", 2400, 1350, "/planes-av/"),
+    ("branding", "srv_name3", 2400, 1601, "/diseno-grafico/"),
+    ("web-app", "srv_name4", 2400, 1601, "/diseno-web/"),
 ]
 
 CSS = """
@@ -101,6 +101,18 @@ grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:clamp(20px,3vw,40px
 color:rgba(0,0,0,.82);opacity:0;transform:translateY(6px);pointer-events:none}
 .srv-row[data-open=true] .srv-name{opacity:0;transform:translateY(-6px);pointer-events:none}
 .srv-row[data-open=true] .srv-what{opacity:1;transform:none;pointer-events:auto}
+.srv-proof-card{color:inherit;transition:background-color .35s ease}
+.srv-proof-media{position:relative;isolation:isolate}
+.srv-proof-media::after{content:"";position:absolute;inset:0;z-index:1;background:#000;opacity:0;
+transition:opacity .35s ease;pointer-events:none}
+.srv-proof-media img{transition:transform .55s cubic-bezier(.22,1,.36,1)}
+@media (hover:hover){
+  .srv-proof-card:hover{background:rgba(0,0,0,.035)}
+  .srv-proof-card:hover .srv-proof-media::after{opacity:.12}
+  .srv-proof-card:hover .srv-proof-media img{transform:scale(1.035)}
+}
+.srv-proof-card:focus-visible .srv-proof-media::after{opacity:.12}
+.srv-proof-card:focus-visible .srv-proof-media img{transform:scale(1.035)}
 /* Mismo barrido de relleno que las páginas de planes: el color sube desde el
    borde inferior en vez de encenderse de golpe. El ::before va detrás del texto
    con z-index:-1, y el isolation:isolate evita que se cuele por debajo del
@@ -133,6 +145,7 @@ align-items:flex-start;justify-content:center;padding:clamp(16px,4vw,56px);overf
   #bs-curtain>div,.js .bs-fade.on{animation:none}
   .js .bs-fade{opacity:1}
   .srv-name,.srv-what{transition:none}
+  .srv-proof-card,.srv-proof-media::after,.srv-proof-media img{transition:none}
 }
 """
 
@@ -180,9 +193,18 @@ SCRIPT = """
   }
   function medir() {
     if (!curtain || !hero) return;
-    var cero = curtain.getBoundingClientRect().top;
-    var total = Math.round(hero.getBoundingClientRect().top - cero);
-    var negro = h1 ? Math.round(h1.getBoundingClientRect().bottom - cero + 14) : Math.round(total * 0.72);
+    var curtainRect = curtain.getBoundingClientRect();
+    // getBoundingClientRect() devuelve píxeles ya ampliados por `zoom`. Si se
+    // escriben directamente como medidas CSS, el breakpoint 4K los amplía una
+    // segunda vez y la cortina termina tapando el párrafo. Volvemos primero a
+    // unidades CSS usando la relación entre el ancho visual y offsetWidth.
+    var escala = curtain.offsetWidth ? curtainRect.width / curtain.offsetWidth : 1;
+    if (!isFinite(escala) || escala <= 0) escala = 1;
+    var cero = curtainRect.top;
+    var total = Math.round((hero.getBoundingClientRect().top - cero) / escala);
+    var negro = h1
+      ? Math.round((h1.getBoundingClientRect().bottom - cero) / escala + 14)
+      : Math.round(total * 0.72);
     if (total > 300 && (total !== lastT || negro !== lastB)) {
       lastT = total; lastB = negro;
       var b = Math.min(negro, Math.round(total * 0.86));
@@ -412,17 +434,15 @@ def page():
                   f'color:rgba(0,0,0,.72);max-width:38ch">{t(line)}</p>{cta}</div></div>')
 
     prueba = "".join(
-        f'<div style="display:flex;flex-direction:column;gap:14px">'
-        f'<div style="width:100%;aspect-ratio:4/3;background:rgba(0,0,0,.04);overflow:hidden">'
-        f'<img src="/assets/services/{img}-1200.webp" '
-        f'srcset="/assets/services/{img}-1200.webp 1200w, /assets/services/{img}-2400.webp 2400w" '
-        f'sizes="(max-width:539px) calc(100vw - 40px), (max-width:1320px) calc((100vw - 96px)/2), 600px" '
+        f'<a href="{destino}" class="srv-proof-card" style="display:flex;flex-direction:column;gap:14px;padding:10px;margin:-10px">'
+        f'<div class="srv-proof-media" style="width:100%;aspect-ratio:4/3;background:rgba(0,0,0,.04);overflow:hidden">'
+        f'<img src="/assets/services/{img}-2400.webp" '
         f'alt="{t(alt)}" width="{w}" height="{ht}" loading="lazy" decoding="async" '
         f'style="width:100%;height:100%;display:block;object-fit:cover"></div>'
         f'<div style="display:flex;flex-direction:column;gap:6px">'
         f'<div style="font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase">{t(lb)}</div>'
-        f'<div style="font-size:14px;line-height:1.5;color:rgba(0,0,0,.6)">{t(d)}</div></div></div>'
-        for (lb, d, _ph), (img, alt, w, ht) in zip(PROOF, PROOF_IMAGES))
+        f'<div style="font-size:14px;line-height:1.5;color:rgba(0,0,0,.6)">{t(d)}</div></div></a>'
+        for (lb, d, _ph), (img, alt, w, ht, destino) in zip(PROOF, PROOF_IMAGES))
 
     h += f"""<div style="position:relative;min-height:100vh">
 <div id="bs-curtain" aria-hidden="true"><div style="background:{CORTINA}"></div></div>
