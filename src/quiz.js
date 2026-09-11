@@ -115,6 +115,12 @@ function TR(s) {
   var d = (window.BORSOGA_I18N || {})[LANG] || {};
   return (d.opt && d.opt[s]) || s;
 }
+// Sustituye {n}, {plan}, {email}… en las cadenas con hueco. Faltaba: ocho
+// llamadas la usaban y no estaba declarada en ningún sitio, así que el paso 2
+// reventaba con "fill is not defined" y no llegaba a pintarse.
+function fill(s, vars) {
+  return String(s).replace(/\{(\w+)\}/g, function (_, k) { return vars[k] != null ? vars[k] : ''; });
+}
 
 var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
   return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]; }); };
@@ -495,7 +501,7 @@ function filedrop(kind, title, note, accept) {
     '<span style="flex:1"><span style="display:block;font-size:16px;font-weight:500">' + esc(title) + '</span>' +
     '<span style="display:block;font-size:14px;color:rgba(0,0,0,.55);margin-top:4px">' + esc(note) + '</span></span>' +
     '<span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:rgba(0,0,0,.5)">' +
-    (n ? n + (n === 1 ? ' archivo' : ' archivos') : 'Elegir') + '</span></label>' +
+    (n ? n + ' ' + t(n === 1 ? 'q_files_1' : 'q_files_n') : lbl('Elegir')) + '</span></label>' +
     FILES[kind].map(function (f, i) {
       return '<span class="q-file"><span>' + esc(f.name) + '</span>' +
         '<button type="button" class="q-back" data-rmfile="' + kind + '" data-i="' + i + '" style="font-size:10px">Quitar</button></span>';
@@ -739,7 +745,7 @@ function render() {
   next.setAttribute('aria-label', nextLabel);
   var aviso = document.getElementById('q-aviso');
   if (S.showErrors && MISSING.length) {
-    aviso.textContent = MISSING.length === 1 ? 'Falta 1 respuesta' : 'Faltan ' + MISSING.length + ' respuestas';
+    aviso.textContent = fill(t(MISSING.length === 1 ? 'q_missing_one' : 'q_missing_many'), { n: MISSING.length });
     aviso.hidden = false;
   } else { aviso.hidden = true; }
 }
@@ -796,7 +802,7 @@ document.addEventListener('input', function (e) {
     var aviso = document.getElementById('q-aviso');
     if (aviso) {
       aviso.hidden = MISSING.length === 0;
-      aviso.textContent = MISSING.length === 1 ? 'Falta 1 respuesta' : 'Faltan ' + MISSING.length + ' respuestas';
+      aviso.textContent = fill(t(MISSING.length === 1 ? 'q_missing_one' : 'q_missing_many'), { n: MISSING.length });
     }
   }
 });

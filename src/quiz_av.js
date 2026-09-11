@@ -580,7 +580,7 @@ function render() {
   next.setAttribute('aria-label', nextLabel);
   var aviso = document.getElementById('q-aviso');
   if (S.showErrors && MISSING.length) {
-    aviso.textContent = MISSING.length === 1 ? 'Falta 1 respuesta' : 'Faltan ' + MISSING.length + ' respuestas';
+    aviso.textContent = fill(t(MISSING.length === 1 ? 'q_missing_one' : 'q_missing_many'), { n: MISSING.length });
     aviso.hidden = false;
   } else aviso.hidden = true;
 }
@@ -635,7 +635,7 @@ document.addEventListener('input', function (e) {
     var av = document.getElementById('q-aviso');
     if (av) {
       av.hidden = MISSING.length === 0;
-      av.textContent = MISSING.length === 1 ? 'Falta 1 respuesta' : 'Faltan ' + MISSING.length + ' respuestas';
+      av.textContent = fill(t(MISSING.length === 1 ? 'q_missing_one' : 'q_missing_many'), { n: MISSING.length });
     }
   }
 });
