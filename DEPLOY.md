@@ -14,10 +14,17 @@ el HTML desde los datos de los artboards; las funciones son TypeScript.
     src/privacidad.py    política de privacidad
     src/quiz.py          configurador (markup)
     src/quiz.js          configurador (lógica, portada del artboard)
+    src/brief.py         páginas de los dos cuestionarios largos
+    src/brief.js         motor común de los cuestionarios
+    src/brief_web.js     preguntas de diseño web (10 pasos)
+    src/brief_grafico.js preguntas de identidad de marca (12 pasos)
+    src/i18n/dw.js       cadenas del cuestionario de web (copia del diseño)
+    src/i18n/gd.js       cadenas del cuestionario de marca (copia del diseño)
     src/upload-client.js puente a Vercel Blob (se empaqueta con esbuild)
     src/build.py         genera build/
     src/dev.py           servidor de desarrollo
     api/submit.ts        recepción de leads
+    api/_brief.ts        reglas de servidor de los dos cuestionarios
     api/blob-upload.ts   emite tokens de subida directa a Blob
 
 ## Desarrollo
@@ -119,15 +126,28 @@ Releer los `.dc.html` con la tool DesignSync, actualizar `src/content.py`
     /visualizacion/            planes de Interior Design
     /configurador/             configurador de interiorismo (6 pasos)
     /diseno-web/               planes de Web y App
+    /cuestionario-web/         cuestionario de diseño web (10 pasos)
     /diseno-grafico/           planes de Branding
+    /cuestionario-grafico/     cuestionario de identidad de marca (12 pasos)
     /politica-de-privacidad/
 
-## Tres servicios en un endpoint
+Cada página tiene su versión inglesa bajo `/en/` con el slug traducido
+(`/cuestionario-web/` → `/en/web-brief/`).
 
-`POST /api/submit/` acepta `service`: `interior` (por defecto), `av` y
-`contacto`. Cada uno con su validación y su enrutamiento, siempre recalculados
-en servidor. Las reglas de AV viven en `api/_av.ts`; las de interiorismo y
-contacto, en `submit.ts`.
+## Cinco servicios en un endpoint
+
+`POST /api/submit/` acepta `service`: `interior` (por defecto), `av`,
+`contacto`, `web` y `grafico`. Cada uno con su validación y su enrutamiento,
+siempre recalculados en servidor. Las reglas de AV viven en `api/_av.ts`; las de
+los dos cuestionarios, en `api/_brief.ts`; las de interiorismo y contacto, en
+`submit.ts`.
+
+Los dos cuestionarios no calculan precio ni recomiendan plan: su ruta es
+siempre `brief` y el campo `plan` es la tarjeta desde la que entró el lead
+(`?plan=Web-Premium`, `?plan=Brand-Essentials`…), no una recomendación. Lo que
+sí deriva el servidor son señales para quien atienda el lead: fecha de
+lanzamiento próxima, ecommerce, naming, packaging, oportunidad cruzada entre
+servicios.
 
 **Cliente y servidor tienen que ir a la par.** Cualquier cambio de reglas hay
 que aplicarlo en los dos sitios: ya nos mordió una vez con el texto de la ruta.
@@ -137,14 +157,11 @@ que aplicarlo en los dos sitios: ya nos mordió una vez con el texto de la ruta.
 - Precios: no se publican. Se definen en contacto directo (decisión 2026-08-27).
 - **Postgres** (aceptar términos de Neon) y **correo** (cuenta de EmailJS).
 - SPF/DKIM/DMARC en borsogastudio.com (para que tus respuestas no caigan en spam).
-- **254 claves sin traducir al inglés** (`src/i18n/PENDIENTES-EN.md`). Hasta que
-  existan, el selector de idioma no se publica.
 - Huecos de imagen: niveles de acabado, prueba de AV y prueba de la portada.
 - La URL `/visualizacion/` aloja Interior Design mientras que "Visualización"
   es ahora el nombre de otro servicio. Renombrarla rompería enlaces publicados.
 - BotID de Vercel sobre el honeypot que ya existe.
 - "Ver un proyecto/sitio real": sin destino, falta portafolio.
-- Formulario 'Solicitar propuesta' para web y gráfico (esos CTA siguen en mailto:).
 - Servicio 02 (Desarrollo de apps): sin planes en el diseño.
 - Fotos de nivel de acabado (paso 4): en blanco a propósito.
 - La política de privacidad es un borrador: revisar con abogado en Florida.

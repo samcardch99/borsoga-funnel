@@ -51,7 +51,11 @@ def _cargar(lang):
     saltándose las que van dentro de una cadena, para saber en qué rama cae
     cada par.
     """
-    raw = open(os.path.join(_SRC, "i18n", f"{lang}.js"), encoding="utf-8").read()
+    return _ramas(open(os.path.join(_SRC, "i18n", f"{lang}.js"), encoding="utf-8").read())
+
+
+def _ramas(raw):
+    """Saca las cuatro ramas del literal, venga de donde venga."""
     fuera = {r: {} for r in RAMAS}
     rama, prof_rama, prof, i, n = None, 0, 0, 0, len(raw)
     while i < n:
@@ -77,13 +81,28 @@ def _cargar(lang):
             i += 1
             continue
         m = re.match(r"(" + "|".join(RAMAS) + r")\s*:\s*\{", raw[i:])
-        if m and (i == 0 or not raw[i - 1].isalnum() and raw[i - 1] != "_"):
+        if m and _suelta(raw, i):
             rama, prof = m.group(1), prof + 1
             prof_rama = prof
             i += m.end()
             continue
+        # Clave sin comillas: es.js las entrecomilla todas, pero los diccionarios
+        # que vienen del diseño escriben `dw_s1: 'Tu proyecto'`.
+        if rama and prof == prof_rama and _suelta(raw, i):
+            m = re.match(r"([A-Za-z_$][\w$]*)\s*:\s*[\"']", raw[i:])
+            if m:
+                ini_v = i + m.end() - 1
+                fin_v = _fin_cadena(raw, ini_v)
+                fuera[rama][m.group(1)] = _texto(raw, ini_v, fin_v)
+                i = fin_v
+                continue
         i += 1
     return fuera
+
+
+def _suelta(raw, i):
+    """¿Empieza aquí una palabra, y no en mitad de otra?"""
+    return i == 0 or (not raw[i - 1].isalnum() and raw[i - 1] not in "_$")
 
 
 def _fin_cadena(raw, i):
@@ -129,6 +148,49 @@ def cadenas(lang):
     if lang not in _cache:
         _cache[lang] = _cargar(lang)
     return _cache[lang]
+
+
+# Cuestionarios que traen su propio diccionario (i18n/dw.js, i18n/gd.js). Son
+# copias literales de los del proyecto de diseño, con los dos idiomas dentro del
+# mismo fichero: `var ES = {...}` y `var EN = {...}`. Se quedan aparte en vez de
+# fundirse en es.js/en.js por dos razones: así se vuelven a sincronizar con el
+# diseño copiando el fichero, y sus cadenas —cientos, y solo suyas— no engordan
+# el bundle de las páginas que no las usan.
+_extra = {}
+
+
+def extra(nombre, lang):
+    """Cadenas de un diccionario propio, en el idioma pedido."""
+    if nombre not in _extra:
+        raw = open(os.path.join(_SRC, "i18n", f"{nombre}.js"), encoding="utf-8").read()
+        _extra[nombre] = {l: _ramas(_bloque(raw, v)) for l, v in (("es", "ES"), ("en", "EN"))}
+    return _extra[nombre].get(lang) or _extra[nombre][ORIGEN]
+
+
+def _bloque(raw, var):
+    """El literal de `var <NOMBRE> = { … }`, con sus llaves emparejadas.
+
+    Se recorta antes de analizarlo porque el fichero trae los dos idiomas
+    seguidos: pasarlo entero al lector de ramas mezclaría el español con el
+    inglés bajo la misma clave.
+    """
+    m = re.search(r"\bvar\s+" + var + r"\s*=\s*\{", raw)
+    if not m:
+        raise ValueError(f"el diccionario no declara {var}")
+    ini, prof, i, n = m.end() - 1, 0, m.end() - 1, len(raw)
+    while i < n:
+        c = raw[i]
+        if c in "\"'":
+            i = _fin_cadena(raw, i)
+            continue
+        if c == "{":
+            prof += 1
+        elif c == "}":
+            prof -= 1
+            if prof == 0:
+                return raw[ini:i + 1]
+        i += 1
+    raise ValueError(f"el bloque {var} no se cierra")
 
 
 def usar(lang):

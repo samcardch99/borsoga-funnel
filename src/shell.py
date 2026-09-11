@@ -10,7 +10,7 @@ import os
 import re
 
 from content import SERVICIOS
-from i18n_load import IDIOMAS, ORIGEN, T, cadenas, idioma, t
+from i18n_load import IDIOMAS, ORIGEN, T, cadenas, extra, idioma, t
 from motion import MOTION_CSS, MOTION_JS, HEAD_INLINE, SCRIPTS, GSAP
 
 SITE = "https://plans.borsogastudio.com"
@@ -31,6 +31,8 @@ SLUGS = {
         "/planes-av/": "/av-plans/",
         "/configurador/": "/configurator/",
         "/configurador-av/": "/av-configurator/",
+        "/cuestionario-web/": "/web-brief/",
+        "/cuestionario-grafico/": "/graphic-brief/",
         "/politica-de-privacidad/": "/privacy-policy/",
     },
 }
@@ -100,6 +102,23 @@ def bundle_i18n(ramas=("ui", "msg", "opt", "plural")):
     payload = json.dumps({lang: datos}, ensure_ascii=False, separators=(",", ":"))
     return (f'<script>window.BORSOGA_LANG="{lang}";'
             f'window.BORSOGA_I18N=Object.assign(window.BORSOGA_I18N||{{}},{payload});</script>')
+
+
+def bundle_extra(nombre):
+    """Cadenas propias de un cuestionario, fusionadas con las de la página.
+
+    Las páginas cargan `bundle_i18n(("ui", "msg"))` y esto encima: así el
+    cuestionario de diseño web no arrastra el vocabulario del de interiorismo ni
+    al revés. Se fusiona en vez de sustituir porque el motor usa las dos cosas
+    —las etiquetas comunes de la interfaz y las preguntas de su servicio.
+    """
+    lang = idioma()
+    d = extra(nombre, lang)
+    payload = json.dumps({r: d[r] for r in ("ui", "msg", "opt")},
+                         ensure_ascii=False, separators=(",", ":"))
+    return ("<script>(function(x,d){var b=(window.BORSOGA_I18N||{})[x];if(!b)return;"
+            "for(var r in d){b[r]=Object.assign(b[r]||{},d[r]);}})"
+            f'("{lang}",{payload});</script>')
 
 
 def selector_idioma(path=None, color="#000", ident=""):

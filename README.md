@@ -4,11 +4,12 @@ Funnel de ventas de [Borsoga Studio](https://plans.borsogastudio.com). Sitio
 estático bilingüe generado con Python, más tres funciones sin servidor que
 recogen los leads.
 
-    src/build.py          genera las 16 páginas en build/
+    src/build.py          genera las 20 páginas en build/
     src/*.py              una página o componente cada uno
     src/quiz*.js          los dos configuradores, en el navegador
+    src/brief*.js         los dos cuestionarios largos: motor y preguntas
     src/i18n/             las cadenas: es.js es el origen, en.js la traducción
-    api/                  submit, blob-upload y los clientes de Twenty y AV
+    api/                  submit, blob-upload y las reglas de cada servicio
     assets/              logos y favicon; el build los copia a build/assets/
 
     npm run build         construye todo
@@ -32,6 +33,12 @@ inglés.** Ese valor es el que compara `api/submit.ts`; traducirlo rompería las
 reglas del servidor. Sólo se traduce al pintarlo, con `lbl()`, nunca el dato que
 viaja.
 
+**Cuatro formularios, dos formas.** Los configuradores de interiorismo y AV
+tienen widgets propios en cada paso, así que cada uno es su propio programa. Los
+dos cuestionarios largos —diseño web y marca— son la misma pieza con otras
+preguntas, así que las preguntas son datos (`brief_web.js`, `brief_grafico.js`)
+y un solo motor las pinta y las valida.
+
 **Un lead no se pierde por un fallo de terceros.** Va a Postgres, al CRM y al
 correo por separado, y cada destino puede caerse sin arrastrar a los demás. Si
 fallaran los tres a la vez, la respuesta lo dice en lugar de fingir que llegó.
@@ -44,6 +51,10 @@ cliente, no tarifas del estudio.
 
 **No manda estimados automáticos.** Los configuradores captan información y
 proponen un plan; el número lo cierra alguien del estudio.
+
+**Los cuestionarios ni siquiera proponen plan.** Recogen un encargo. Si el lead
+entró desde una tarjeta de plan, ese dato viaja con él, pero como procedencia,
+no como recomendación.
 
 ## Despliegue
 

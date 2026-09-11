@@ -4,6 +4,7 @@ import os, shutil, sys
 from content import *
 from shell import *
 from i18n_load import IDIOMAS, ORIGEN, usar, faltantes, sin_traducir
+import brief
 import privacidad
 import quiz
 import quiz_av
@@ -12,10 +13,14 @@ import servicios as pag_servicios   # alias: shell exporta una función servicio
 
 OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "build")
 
-# CTA provisional hasta que exista el configurador / formulario de propuesta.
+# Queda para la portada y el aviso de noscript: las páginas de planes ya no
+# mandan a correo, sino a su cuestionario.
 MAIL = "borsogastudio@gmail.com"
 def mailto(asunto):
     return f"mailto:{MAIL}?subject={asunto.replace(' ', '%20')}"
+
+CUEST_WEB = "/cuestionario-web/"
+CUEST_GRAFICO = "/cuestionario-grafico/"
 
 
 def plan_nav(items):
@@ -54,12 +59,17 @@ def plan_head(num, name, tagline, desc, ringn, badge=False, white=False):
             f'<p style="margin:0;font-size:clamp(18px,1.7vw,23px);font-weight:300;line-height:1.4;color:{tc}">{T(tagline)}</p>{d}')
 
 
-def ctas(primary, secondary, href, white=False):
+def ctas(primary, secondary, href, white=False, href2=None):
+    """Los dos botones de un plan. El primero pide propuesta; el segundo enseña.
+
+    Llevan a sitios distintos desde que existe el cuestionario: uno abre el
+    formulario con el plan en la URL y el otro baja a la sección de cierre.
+    """
     p = "btn-w" if white else "btn-d"
     s = "btn-o" if white else "btn-l"
     return (f'<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:4px">'
             f'<a href="{href}" class="{p}" style="{BTN};flex:1 1 190px">{T(primary)}</a>'
-            f'<a href="{href}" class="{s}" style="{BTN};flex:1 1 190px">{T(secondary)}</a></div>')
+            f'<a href="{href2 or href}" class="{s}" style="{BTN};flex:1 1 190px">{T(secondary)}</a></div>')
 
 
 def ideal(text, white=False):
@@ -89,7 +99,7 @@ def page_web():
              "Tres planes de diseño web hechos a medida desde cero: Essential, Premium y "
              "Borsoga Edition. Sin plantillas ni constructores genéricos.", "/diseno-web/")
     h += header("Solicitar propuesta", "#propuesta")
-    cta = mailto("Propuesta de diseño web")
+    cta = CUEST_WEB
 
     h += hero("Diseño web", "Un sitio hecho a medida, no ensamblado",
               "Los tres planes comparten el mismo estándar de autoría y calidad. Lo que cambia no es "
@@ -105,7 +115,8 @@ def page_web():
                         "Sitio de presencia profesional, hecho a medida desde cero. Sin plantillas, "
                         "sin constructores genéricos.", 1)
             + statbar([stat("5", "secciones"), stat("1", "ronda de revisiones")])
-            + ctas("Solicitar propuesta", "Ver un sitio real", cta) + '</div>')
+            + ctas("Solicitar propuesta", "Ver un sitio real", cta + "?plan=Web-Essential",
+                   href2="#propuesta") + '</div>')
     right = (f'<div style="{COL_R}">' + block("Incluye", WEB_ESSENTIAL_INCLUYE)
              + ideal("Profesionales, estudios y negocios que necesitan una presencia digital seria y bien construida.")
              + '</div>')
@@ -117,7 +128,8 @@ def page_web():
                         "Todo lo de Essential, más profundidad de contenido, movimiento y capacidad de gestión.",
                         2, badge=True)
             + statbar([stat("12", "páginas"), stat("2", "rondas de revisiones")])
-            + ctas("Solicitar propuesta", "Ver un sitio real", cta) + '</div>')
+            + ctas("Solicitar propuesta", "Ver un sitio real", cta + "?plan=Web-Premium",
+                   href2="#propuesta") + '</div>')
     right = (f'<div style="{COL_R}">'
              + inherit_box("Todo lo del plan Web Essential", WEB_INHERIT_PREMIUM, 1)
              + block("Suma a Essential", WEB_PREMIUM_SUMA)
@@ -132,7 +144,8 @@ def page_web():
                         "Desarrollo a medida: el sitio deja de ser una vitrina y pasa a ser infraestructura de negocio.",
                         3, white=True)
             + statbar([stat("3", "rondas", True), stat("6", "meses de soporte", True)], white=True)
-            + ctas("Solicitar propuesta", "Ver una plataforma real", cta, white=True) + '</div>')
+            + ctas("Solicitar propuesta", "Ver una plataforma real", cta + "?plan=Web-Edition",
+                   white=True, href2="#propuesta") + '</div>')
     grp = "".join(block(t, items, white=True) for t, items in WEB_EDITION_GROUPS)
     right = (f'<div style="{COL_R}">'
              + inherit_box("Todo lo del plan Web Premium", WEB_INHERIT_EDITION, 2, white=True)
@@ -175,7 +188,7 @@ def page_grafico():
              "Brand Identity, Social Media Design y Marketing & Graphic Design. Una sola dirección "
              "creativa, desde la identidad hasta cada punto de contacto.", "/diseno-grafico/")
     h += header("Solicitar propuesta", "#propuesta")
-    cta = mailto("Propuesta de diseño gráfico")
+    cta = CUEST_GRAFICO
 
     h += hero("Diseño gráfico", "Una sola dirección creativa",
               "Todos los productos comparten el mismo estándar de autoría, criterio y calidad. Lo que "
@@ -195,7 +208,7 @@ def page_grafico():
                         "Identidad visual esencial para negocios que necesitan presentarse de forma "
                         "profesional sin construir todavía un sistema de marca extenso.", 1)
             + statbar([stat("1", "ronda de revisiones")])
-            + f'<div style="margin-top:4px"><a href="{cta}" class="btn-d" style="{BTN}">Solicitar propuesta</a></div></div>')
+            + f'<div style="margin-top:4px"><a href="{cta}?plan=Brand-Essentials" class="btn-d" style="{BTN}">Solicitar propuesta</a></div></div>')
     right = (f'<div style="{COL_R}">' + block("Incluye", BRAND_ESSENTIALS)
              + ideal("Emprendimientos, profesionales y negocios que necesitan una identidad visual seria, "
                      "coherente y lista para utilizarse.") + '</div>')
@@ -207,7 +220,7 @@ def page_grafico():
                         "gráfica y aplicaciones que permiten que la marca funcione de forma consistente "
                         "en distintos puntos de contacto.", 2, badge=True)
             + statbar([stat("2", "rondas de revisiones")])
-            + f'<div style="margin-top:4px"><a href="{cta}" class="btn-d" style="{BTN}">Solicitar propuesta</a></div></div>')
+            + f'<div style="margin-top:4px"><a href="{cta}?plan=Brand-Premium" class="btn-d" style="{BTN}">Solicitar propuesta</a></div></div>')
     apps = ('<div><div style="' + LIST_HEAD + '">' + T("Aplicaciones posibles") + '</div>'
             '<ul style="display:flex;flex-direction:column;gap:7px;padding-top:14px">'
             + "".join(f'<li style="font-size:15px;line-height:1.5;color:rgba(0,0,0,.7)">{T(ap)}</li>'
@@ -226,7 +239,7 @@ def page_grafico():
                         "en la identidad y pasa a construir un ecosistema visual completo, preparado para "
                         "comunicación, campañas y crecimiento.", 3, white=True)
             + statbar([stat("3", "rondas de revisiones", True)], white=True)
-            + f'<div style="margin-top:4px"><a href="{cta}" class="btn-w" style="{BTN}">Solicitar propuesta</a></div></div>')
+            + f'<div style="margin-top:4px"><a href="{cta}?plan=Brand-Edition" class="btn-w" style="{BTN}">Solicitar propuesta</a></div></div>')
     right = (f'<div style="{COL_R}">'
              + inherit_box("Todo lo de Brand Premium", BRAND_INHERIT_EDITION, 2, white=True)
              + "".join(block(t, i, white=True) for t, i in BRAND_EDITION_GROUPS)
@@ -271,7 +284,7 @@ def page_grafico():
                         "Plan mensual para negocios que necesitan mantener sus canales activos con una "
                         "línea gráfica clara y consistente.", 1)
             + statbar([stat("8", "piezas al mes")])
-            + f'<div style="margin-top:4px"><a href="{cta}" class="btn-d" style="{BTN}">Solicitar propuesta</a></div></div>')
+            + f'<div style="margin-top:4px"><a href="{cta}?plan=Social-Essential" class="btn-d" style="{BTN}">Solicitar propuesta</a></div></div>')
     right = (f'<div style="{COL_R}">' + block("Incluye", SOCIAL_ESSENTIAL)
              + ideal("Negocios que ya tienen una identidad definida y necesitan una presencia visual "
                      "estable y profesional en redes.") + '</div>')
@@ -283,7 +296,7 @@ def page_grafico():
                         "Todo lo de Social Essential, con una mezcla más completa de formatos y un mayor "
                         "nivel de dirección visual.", 2, badge=True)
             + statbar([stat("12–16", "piezas al mes")])
-            + f'<div style="margin-top:4px"><a href="{cta}" class="btn-d" style="{BTN}">Solicitar propuesta</a></div></div>')
+            + f'<div style="margin-top:4px"><a href="{cta}?plan=Social-Premium" class="btn-d" style="{BTN}">Solicitar propuesta</a></div></div>')
     right = (f'<div style="{COL_R}">'
              + inherit_box("Todo lo de Social Essential", SOCIAL_INHERIT, 1)
              + block("Suma a Essential", SOCIAL_PREMIUM)
@@ -297,7 +310,7 @@ def page_grafico():
                         "Borsoga funciona como una extensión del equipo creativo de la marca. El objetivo "
                         "no es aumentar únicamente la cantidad de publicaciones, sino dirigir cómo la marca "
                         "se ve, se mueve y comunica visualmente a lo largo del tiempo.", 3, white=True)
-            + f'<div style="margin-top:4px"><a href="{cta}" class="btn-w" style="{BTN}">Solicitar propuesta</a></div></div>')
+            + f'<div style="margin-top:4px"><a href="{cta}?plan=Social-Edition" class="btn-w" style="{BTN}">Solicitar propuesta</a></div></div>')
     right = (f'<div style="{COL_R}">'
              + "".join(block(t, i, white=True) for t, i in SOCIAL_EDITION_GROUPS)
              + ideal("Marcas que necesitan un equipo creativo externo capaz de sostener y dirigir su "
@@ -524,11 +537,12 @@ def _limpiar(vivos):
 LISTAS_EN = {"index.html", "planes-av/index.html",
              "interior-design/index.html", "diseno-web/index.html",
              "diseno-grafico/index.html", "politica-de-privacidad/index.html",
-             "configurador/index.html", "configurador-av/index.html"}
+             "configurador/index.html", "configurador-av/index.html",
+             "cuestionario-web/index.html", "cuestionario-grafico/index.html"}
 
 
 def _paginas():
-    """Las ocho páginas, resueltas en el idioma que esté activo."""
+    """Las diez páginas, resueltas en el idioma que esté activo."""
     return {
         "index.html": pag_servicios.page(),
         "diseno-web/index.html": page_web(),
@@ -537,6 +551,8 @@ def _paginas():
         "politica-de-privacidad/index.html": privacidad.page(),
         "configurador/index.html": quiz.page(),
         "configurador-av/index.html": quiz_av.page(),
+        "cuestionario-web/index.html": brief.page("web"),
+        "cuestionario-grafico/index.html": brief.page("grafico"),
         "planes-av/index.html": planes_av.page(),
     }
 
@@ -587,7 +603,8 @@ def main():
             destino = _salida(path, lang)
             pages[destino] = localizar_enlaces(html, lang, vivas)
             # Los configuradores no se indexan: son herramientas, no entradas.
-            if "configurador" not in path and "configurator" not in destino:
+            if not any(x in path or x in destino
+                       for x in ("configurador", "configurator", "cuestionario", "brief")):
                 urls.append("/" + destino.replace("index.html", ""))
     usar(ORIGEN)
 

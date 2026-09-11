@@ -1,5 +1,7 @@
 /**
- * Recepción del configurador de Interior Design.
+ * Recepción de los formularios del sitio: los dos configuradores (interiorismo
+ * y AV), los dos cuestionarios (diseño web e identidad de marca) y la consulta
+ * corta de la portada.
  *
  * Recibe JSON con `answers`, `derived` y las URLs de los archivos que el
  * cliente ya subió directo a Blob. Guarda el lead en Postgres y avisa al
@@ -163,11 +165,16 @@ export default async function handler(req: any, res: any) {
   const payload = typeof req.body === "string" ? safeParse(req.body) : req.body;
   if (!payload) return json({ ok: false, error: "Datos mal formados." }, 400);
 
-  // Dos servicios, dos juegos de reglas. El cliente dice cuál, pero las
+  // Cada servicio trae su juego de reglas. El cliente dice cuál, pero las
   // reglas que se aplican son siempre las del servidor.
-  const service = ["av", "contacto"].includes(payload.service) ? payload.service : "interior";
+  const service = ["av", "contacto", "web", "grafico"].includes(payload.service)
+    ? payload.service : "interior";
   const AV = service === "av" ? await import("./_av.js") : null;
   const ES_CONTACTO = service === "contacto";
+  // Los dos cuestionarios largos comparten módulo: mismas reglas, otro juego de
+  // preguntas. No calculan precio, así que no hay plan que recomendar.
+  const ES_BRIEF = service === "web" || service === "grafico";
+  const BRIEF = ES_BRIEF ? await import("./_brief.js") : null;
 
   let a: Answers = payload.answers || {};
   const clientDerived: any = payload.derived || {};
@@ -175,19 +182,26 @@ export default async function handler(req: any, res: any) {
 
   // El formulario de la portada es una consulta corta, no un cuestionario:
   // valida solo lo que necesita para poder responder.
-  const bad = ES_CONTACTO ? validarContacto(a) : (AV ? AV.validate(a) : validate(a));
+  const bad = BRIEF ? BRIEF.validate(a, service, uploads)
+    : ES_CONTACTO ? validarContacto(a) : (AV ? AV.validate(a) : validate(a));
   // Al bot le devolvemos ok: si le decimos que lo pillamos, prueba otra cosa.
-  if (bad === "bot") return json({ ok: true, route: AV ? AV.route(a, "") : route(a, "") });
+  if (bad === "bot") {
+    return json({ ok: true, route: BRIEF ? BRIEF.route(service) : AV ? AV.route(a, "") : route(a, "") });
+  }
   if (bad) return json({ ok: false, error: bad }, 422);
 
-  a = sanitize(a);
+  a = sanitize(BRIEF ? BRIEF.normaliza(a) : a);
   const picked = String(clientDerived?.picked || "");
   const rt: [string, string, string] = ES_CONTACTO
     ? ["call", "Recibimos tu mensaje", "Te escribimos en persona para hablar del proyecto."]
+    : BRIEF ? BRIEF.route(service)
     : (AV ? AV.route(a, picked) : route(a, picked));
-  const plan = ES_CONTACTO ? "—" : (picked || (AV ? AV.recommendPlan(a) : recommendPlan(a)));
+  // En los cuestionarios el plan no se calcula: es la tarjeta desde la que
+  // llegó el lead, si es que llegó desde una.
+  const plan = (ES_CONTACTO || BRIEF) ? (picked || "—")
+    : (picked || (AV ? AV.recommendPlan(a) : recommendPlan(a)));
   // Si el cliente calculó otra ruta, lo anotamos: o hay un bug, o alguien tocó.
-  const mismatch = !ES_CONTACTO && clientDerived?.route && clientDerived.route !== rt[0]
+  const mismatch = !ES_CONTACTO && !BRIEF && clientDerived?.route && clientDerived.route !== rt[0]
     ? `cliente=${clientDerived.route} servidor=${rt[0]}` : null;
 
   // ---------------------------------------------------------------- archivos
@@ -197,7 +211,8 @@ export default async function handler(req: any, res: any) {
   const files = uploads.filter((u) => {
     const ok = u && typeof u.url === "string" &&
       /^https:\/\/[a-z0-9-]+\.(public\.)?blob\.vercel-storage\.com\//.test(u.url) &&
-      ["photos", "planFiles", "applianceFiles"].includes(u.kind);
+      ["photos", "planFiles", "applianceFiles",
+       "brandFiles", "refFiles", "currentFiles", "spaceFiles"].includes(u.kind);
     if (!ok) fileErrors.push(`referencia de archivo descartada: ${String(u?.name).slice(0, 60)}`);
     return ok;
   }).map((u) => ({ kind: u.kind, name: String(u.name).slice(0, 200), url: u.url, size: Number(u.size) || 0 }));
@@ -226,9 +241,10 @@ export default async function handler(req: any, res: any) {
          unsure, structural, mismatch, answers, derived, files)
         values (${service}, ${a.name}, ${a.email}, ${a.phone}, ${a.city},
                 ${AV ? a.country : (a.state || null)}, ${plan}, ${rt[0]},
-                ${ES_CONTACTO ? 0 : (AV ? AV.sceneTotal(a) : unitTotal(a))},
-                ${ES_CONTACTO ? null : (AV ? AV.imageTotal(a, picked) : (clientDerived?.imageTotal ?? null))},
-                ${ES_CONTACTO ? 0 : unsureCount(a)}, ${(AV || ES_CONTACTO) ? false : structuralFlag(a)}, ${mismatch},
+                ${(ES_CONTACTO || BRIEF) ? 0 : (AV ? AV.sceneTotal(a) : unitTotal(a))},
+                ${(ES_CONTACTO || BRIEF) ? null : (AV ? AV.imageTotal(a, picked) : (clientDerived?.imageTotal ?? null))},
+                ${(ES_CONTACTO || BRIEF) ? 0 : unsureCount(a)},
+                ${(AV || ES_CONTACTO || BRIEF) ? false : structuralFlag(a)}, ${mismatch},
                 ${JSON.stringify(a)}, ${JSON.stringify(clientDerived || {})},
                 ${JSON.stringify(files)})
         returning id`;
@@ -265,8 +281,10 @@ export default async function handler(req: any, res: any) {
   // lead ya está guardado y el correo sale igual: nunca tumba el envío.
   const { pushToTwenty } = await import("./_twenty.js");
   const crm = await pushToTwenty(a, clientDerived, plan, rt, files, service,
-                                 AV ? AV.noteBody(a, picked, rt, files) : null,
-                                 AV ? AV.sceneSummary(a) : null);
+                                 BRIEF ? BRIEF.noteBody(a, service, plan, rt, files)
+                                       : AV ? AV.noteBody(a, picked, rt, files) : null,
+                                 BRIEF ? BRIEF.resumenLinea(a)
+                                       : AV ? AV.sceneSummary(a) : null);
   if (crm.error) console.warn("Twenty:", crm.error);
 
   // ---------------------------------------------------------------- aviso
@@ -297,15 +315,24 @@ export default async function handler(req: any, res: any) {
     const line = (k: string, v: any) => (v ? `<tr><td style="padding:4px 14px 4px 0;color:#666">${k}</td><td>${String(v)}</td></tr>` : "");
     const body = `<div style="font-family:system-ui,sans-serif;font-size:14px;line-height:1.5">
 <h2 style="margin:0 0 4px">${rt[1]} · ${plan}</h2>
-<p style="margin:0 0 16px;color:#666">Servicio: <strong>${service}</strong> · Ruta: <strong>${rt[0]}</strong>${AV ? AV.flags(a).map((f) => `<br>⚠ ${f}`).join("") : ""}${mismatch ? ` · ⚠ discrepancia: ${mismatch}` : ""}${structuralFlag(a) ? " · ⚠ obra estructural" : ""}</p>
+<p style="margin:0 0 16px;color:#666">Servicio: <strong>${service}</strong> · Ruta: <strong>${rt[0]}</strong>${(BRIEF ? BRIEF.flags(a, service) : AV ? AV.flags(a) : []).map((f: string) => `<br>⚠ ${f}`).join("")}${mismatch ? ` · ⚠ discrepancia: ${mismatch}` : ""}${(!BRIEF && !ES_CONTACTO && structuralFlag(a)) ? " · ⚠ obra estructural" : ""}</p>
 <table style="border-collapse:collapse">
 ${line("Nombre", a.name)}${line("Correo", a.email)}${line("Teléfono", a.phone)}
+${BRIEF ? `
+${line("Marca", a.company)}${line("Web o redes", a.webSocial)}
+${line("Proyecto", a.projectType)}${line("Categoría", a.category)}
+${line("Qué hace", a.whatDoes)}
+${line(service === "web" ? "Objetivo del sitio" : "Etapa", service === "web" ? a.goal : a.stage)}
+${line("Personalidad", (a.personality || []).join(", "))}
+${line("Lanzamiento", [a.launchDate, a.launchDateValue].filter(Boolean).join(" · "))}
+${line("Presupuesto", a.budgetValue || a.budget)}${line("Aprobación", a.approvers)}` : `
 ${line("Dirección", [a.street, a.city, a.state, a.zip].filter(Boolean).join(", "))}
 ${line("Proyecto", [a.projectType, a.workType].filter(Boolean).join(" · "))}
 ${line(AV ? "Escenas" : "Espacios", AV ? AV.sceneSummary(a) : clientDerived?.spaceSummary)}${line("Imágenes", AV ? AV.imageTotal(a, picked) : clientDerived?.imageTotal)}
 ${line(AV ? "Tono" : "Acabado", AV ? a.tone : a.finish)}${line("Presupuesto", a.budget)}${line("Cuándo", a.timing)}
 ${line("Quién decide", a.decider)}${line("Extras", (a.extras || []).join(", "))}
-${line("Archivos", files.length)}${line("Sin definir", unsureCount(a))}
+${line("Sin definir", unsureCount(a))}`}
+${line("Archivos", files.length)}
 ${line("Lead", leadId)}${line("CRM", crm.opportunityId ? "oportunidad creada" : `⚠ ${crm.error}`)}
 </table>
 ${files.length ? `<p><strong>Archivos (privados):</strong><br>${files.map((f: any) => f.url).join("<br>")}</p>` : ""}
@@ -313,7 +340,13 @@ ${fileErrors.length ? `<p style="color:#b00">Archivos con problema:<br>${fileErr
 ${dbError ? `<p style="color:#b00"><strong>No se guardó en la base de datos:</strong> ${dbError}${backupUrl ? `<br>Copia en Blob: ${backupUrl}` : "<br>Este correo es la única copia. Guárdalo."}</p>` : ""}
 <pre style="background:#f6f6f6;padding:14px;overflow:auto;font-size:12px">${JSON.stringify(a, null, 1).replace(/</g, "&lt;").slice(0, 12000)}</pre>
 </div>`;
-    const subject = `${rt[0] === "call" ? "[LLAMADA]" : rt[0] === "range" ? "[RANGO]" : "[ESTIMADO]"} ${service === "av" ? "AV" : service === "contacto" ? "CONSULTA" : "Interior"} · ${a.name} · ${a.city || ""} · ${plan}`;
+    const ETIQUETA: Record<string, string> = {
+      av: "AV", contacto: "CONSULTA", web: "Web", grafico: "Marca", interior: "Interior",
+    };
+    const PREFIJO: Record<string, string> = {
+      call: "[LLAMADA]", range: "[RANGO]", brief: "[CUESTIONARIO]", mail: "[ESTIMADO]",
+    };
+    const subject = `${PREFIJO[rt[0]] || "[ESTIMADO]"} ${ETIQUETA[service] || service} · ${a.name} · ${BRIEF ? (a.company || "") : (a.city || "")} · ${plan}`;
     try {
       const r = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
         method: "POST",

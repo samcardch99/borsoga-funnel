@@ -147,6 +147,20 @@ function noteBody(a: Answers, d: any, plan: string, rt: string[], files: any[]) 
   ].join("");
 }
 
+const SERVICIO: Record<string, string> = {
+  interior: "Interior", av: "AV", web: "Diseño web", grafico: "Identidad de marca",
+};
+const ES_CUESTIONARIO: Record<string, boolean> = { web: true, grafico: true };
+
+/** Cómo se llama la oportunidad en el CRM, según de qué formulario venga. */
+function tituloOportunidad(a: Answers, d: any, plan: string, service: string, resumen: string | null) {
+  if (service === "contacto") return a.servicio || "Consulta";
+  // En los cuestionarios el plan es opcional —solo existe si el lead entró
+  // desde una tarjeta—, así que la marca y su categoría llevan el nombre.
+  const cola = resumen || d?.spaceSummary || (service === "av" ? "visualización" : "interior design");
+  return plan && plan !== "—" ? `${plan} · ${cola}` : cola;
+}
+
 export async function pushToTwenty(
   a: Answers, d: any, plan: string, rt: string[], files: any[],
   service: string = "interior", customNote: string | null = null, resumen: string | null = null,
@@ -168,7 +182,7 @@ export async function pushToTwenty(
     const personId = p.id;
 
     const opp = await post("/opportunities", {
-      name: `${a.name} · ${service === "contacto" ? (a.servicio || "Consulta") : plan + " · " + (resumen || d?.spaceSummary || (service === "av" ? "visualización" : "interior design"))}`.slice(0, 120),
+      name: `${a.name} · ${tituloOportunidad(a, d, plan, service, resumen)}`.slice(0, 120),
       stage: "NEW",
       position: "first",
       pointOfContactId: personId,
@@ -190,7 +204,9 @@ export async function pushToTwenty(
       ? `**Consulta desde la portada de servicios**\n\n- **Servicio:** ${a.servicio || "—"}\n\n${a.project || ""}`
       : noteBody(a, d, plan, rt, files));
     const note = await post("/notes", {
-      title: (service === "contacto" ? `Consulta · ${a.servicio || "portada"}` : `Configurador ${service === "av" ? "AV" : "Interior"} · ${rt[1]} · ${plan}`).slice(0, 120),
+      title: (service === "contacto"
+        ? `Consulta · ${a.servicio || "portada"}`
+        : `${ES_CUESTIONARIO[service] ? "Cuestionario" : "Configurador"} ${SERVICIO[service] || service} · ${rt[1]}${plan && plan !== "—" ? ` · ${plan}` : ""}`).slice(0, 120),
       bodyV2: { markdown: contacto + cuerpo },
       position: "first",
     }, ac.signal);

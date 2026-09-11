@@ -9,6 +9,12 @@ seguían en español; se cerraron todas.
   inglés necesita entradas
 - 85 claves declaradas en `IGUALES.txt` cuya traducción correcta es
   quedarse igual (nombres propios, marcas, números)
+- `dw.js` y `gd.js` van aparte: son los diccionarios de los dos cuestionarios
+  largos, copiados tal cual del proyecto de Claude Design, con el español y el
+  inglés dentro del mismo fichero. Se quedan fuera de `es.js`/`en.js` para poder
+  volver a sincronizarlos copiando el fichero, y para que sus cadenas no
+  engorden el bundle de las páginas que no las usan. Están completos en los dos
+  idiomas: `dw` 113 ui · 39 msg · 166 opt; `gd` 105 ui · 31 msg · 122 opt
 
 ## Cómo se comprueba
 
