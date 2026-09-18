@@ -227,7 +227,6 @@ export function noteBody(a: A, service: string, plan: string, rt: string[], file
     row("Problema que resuelve", a.problem),
     row("Frente a la competencia", lista(a.vsComp)),
     row("Cliente ideal", a.idealCompanies),
-    row("Quién decide la compra", lista(a.decisionMaker)),
     row("Elementos con significado", a.meaningWhich),
     row("Evitar", a.avoidElements),
     row("Color", [a.brandColors, a.whichColors].filter(Boolean).join(" · ")),
