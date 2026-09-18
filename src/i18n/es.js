@@ -38,6 +38,7 @@ window.BORSOGA_I18N = Object.assign(window.BORSOGA_I18N || {}, {
     "q_files_n": "archivos",
     "err_send": "No pudimos enviarlo. Inténtalo otra vez o escríbenos.",
     "err_net": "No pudimos enviarlo. Revisa tu conexión e inténtalo otra vez.",
+    "err_upload": "No pudimos subir tus archivos. Inténtalo otra vez o escríbenos a borsogastudio@gmail.com.",
     "f_name": "nombre",
     "f_email": "correo",
     "f_phone": "teléfono",

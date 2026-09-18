@@ -26,6 +26,8 @@ el HTML desde los datos de los artboards; las funciones son TypeScript.
     api/submit.ts        recepción de leads
     api/_brief.ts        reglas de servidor de los dos cuestionarios
     api/blob-upload.ts   emite tokens de subida directa a Blob
+    api/file.ts          abre un archivo privado desde el enlace firmado del aviso
+    api/_files.ts        valida las referencias de archivo y firma sus enlaces
 
 ## Desarrollo
 
@@ -55,6 +57,13 @@ autoconstruye: no hay que subir `build/`.
 - **Postgres** — pendiente. Requiere aceptar los términos de Neon en el
   navegador: `vercel install neon`. En cuanto exista `DATABASE_URL`, la
   función crea la tabla `leads` sola y deja de usar el respaldo en Blob.
+
+Los archivos son privados: su URL de Blob da **403** a quien no lleve el token.
+Por eso el correo y el CRM no enlazan a Blob sino a `/api/file/?p=…&s=…`, que
+comprueba una firma HMAC de la ruta y sirve el archivo desde el servidor. La
+firma no caduca, para que el enlace siga abriéndose desde un correo viejo. La
+clave es `FILE_LINK_SECRET` si existe y, si no, el token de Blob: cambiar
+cualquiera de los dos invalida todos los enlaces ya enviados.
 
 ## Correo
 
@@ -130,6 +139,10 @@ Releer los `.dc.html` con la tool DesignSync, actualizar `src/content.py`
     /diseno-grafico/           planes de Branding
     /cuestionario-grafico/     cuestionario de identidad de marca (12 pasos)
     /politica-de-privacidad/
+    /mutati/                   TEMPORAL: cuestionario de Mutati (cliente), noindex,
+                               fuera del sitemap. Envía por correo vía api/mutati.ts,
+                               sin Postgres ni CRM. Borrar src/mutati.py, api/mutati.ts
+                               y su línea en build.py cuando ya no haga falta.
 
 Cada página tiene su versión inglesa bajo `/en/` con el slug traducido
 (`/cuestionario-web/` → `/en/web-brief/`).

@@ -421,6 +421,9 @@ function arranca(spec) {
     });
     var lote = Date.now().toString(36) + Math.floor(Math.random() * 1e6).toString(36);
     var subidos = [];
+    // Para decir en qué paso falló: el mensaje del SDK de Blob está en inglés
+    // técnico y no le sirve al cliente.
+    var subiendo = true;
 
     cargaSubidor(pending.length)
       .then(function () {
@@ -445,6 +448,7 @@ function arranca(spec) {
         }, Promise.resolve());
       })
       .then(function () {
+        subiendo = false;
         return fetch('/api/submit/', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
@@ -462,8 +466,9 @@ function arranca(spec) {
         render();
       })
       .catch(function (err) {
+        if (window.console) console.error(err);
         S.sending = false;
-        S.notice = err && err.message ? err.message : t('err_net');
+        S.notice = subiendo && pending.length ? t('err_upload') : t('err_net');
         render();
       });
   }

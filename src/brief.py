@@ -98,24 +98,29 @@ gap:clamp(12px,1.4vw,18px);background:transparent}
 .q-fin .q-sum div{border-radius:16px}
 .q-invalid .q-card[aria-pressed=true],.q-invalid .q-chip[aria-pressed=true]{
 box-shadow:0 0 0 1.5px #b42318!important}
-/* La marca girando detrás del contenido, **solo en móvil**. El artboard la
-   trae como 28 trazos en línea; aquí vive en `assets/borsoga-fondo.svg` para no
-   repetir 14 KB en cada página y para que el navegador la cachee entre los dos
-   cuestionarios. El giro lo pone la página porque el tamaño cambia con la
-   pantalla. */
-.q-fondo{display:none;position:fixed;inset:0;z-index:0;overflow:hidden;
-pointer-events:none;opacity:.28}
-.q-fondo img{position:absolute;top:50%;left:50%;width:min(150%,560px);height:auto;
+/* La marca girando detrás del contenido, en escritorio y en móvil. El artboard
+   la trae como 28 trazos en línea; aquí vive en `assets/borsoga-fondo.svg` para
+   no repetir 14 KB en cada página y para que el navegador la cachee entre los
+   dos cuestionarios. El giro lo pone la página porque el tamaño cambia con la
+   pantalla.
+
+   En escritorio la marca cabe entera en el hueco entre la cabecera y la barra
+   inferior, sin meterse detrás de ninguna de las dos. Ninguna tiene alto fijo
+   (la barra gana una fila cuando sale un aviso), así que un script mide las dos
+   y deja sus altos en --q-top y --q-bottom. En móvil ocupa la pantalla entera,
+   con el tamaño del artboard de iPhone. */
+.q-fondo{position:fixed;left:0;right:0;top:var(--q-top,0px);bottom:var(--q-bottom,0px);
+z-index:0;overflow:hidden;pointer-events:none;opacity:.28}
+.q-fondo img{position:absolute;top:50%;left:50%;height:min(100%,calc(100vw - 48px));width:auto;
 transform:translate(-50%,-50%);transform-origin:center;display:block;
 animation:bs-spin 120s linear infinite;
-/* La marca desborda la pantalla a propósito: el `img{max-width:100%}` de la
-   hoja base la encogía hasta caber, y el diseño la quiere recortada. */
+/* En móvil la marca desborda la pantalla a propósito: el `img{max-width:100%}`
+   de la hoja base la encogía hasta caber, y el diseño la quiere recortada. */
 max-width:none}
 @keyframes bs-spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.q-fondo img{animation:none}}
 /* El contenido va por encima: el fondo es un elemento posicionado y, sin esto,
-   taparía el texto en vez de quedarse detrás. Se deja puesto en los dos tamaños
-   porque no cuesta nada y evita que reaparezca el problema si el fondo vuelve. */
+   taparía el texto en vez de quedarse detrás. */
 .q-main,.q-volver-fila{position:relative;z-index:1}
 .q-cab{width:min(100%,1080px);margin:0 auto;padding:0 clamp(20px,4vw,40px);height:68px;
 display:flex;align-items:center;justify-content:space-between;gap:20px}
@@ -167,7 +172,8 @@ cursor:default}
    de 18 px, cabecera de 56 px, título de paso a 29 px y una sola columna en
    todas las listas de opciones. */
 @media (max-width:640px){
-  .q-fondo{display:block}
+  .q-fondo{top:0;bottom:0}
+  .q-fondo img{width:min(150%,560px);height:auto}
   .q-cab{padding:0 18px;height:56px;gap:12px}
   .q-cab img{width:104px}
   .q-seg{padding:0 18px 12px;gap:2px}
@@ -301,5 +307,27 @@ def page(cual):
 
 {nav()}
 </div>
+<script>
+// Altos de la cabecera y de la barra inferior para encajar la marca del fondo.
+// La barra empieza oculta y cambia de alto con el aviso: ResizeObserver avisa
+// en los dos casos.
+(function () {{
+  var raiz = document.documentElement;
+  var cab = document.querySelector('.q-wrap > header');
+  var barra = document.getElementById('q-nav');
+  function medir() {{
+    raiz.style.setProperty('--q-top', (cab ? cab.offsetHeight : 0) + 'px');
+    raiz.style.setProperty('--q-bottom', (barra && !barra.hidden ? barra.offsetHeight : 0) + 'px');
+  }}
+  medir();
+  if (window.ResizeObserver) {{
+    var ro = new ResizeObserver(medir);
+    if (cab) ro.observe(cab);
+    if (barra) ro.observe(barra);
+  }} else {{
+    window.addEventListener('resize', medir);
+  }}
+}})();
+</script>
 {_js("brief.js", c["spec"])}"""
     return h + footer().replace("</main>\n", "")

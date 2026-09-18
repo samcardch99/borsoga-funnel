@@ -9,6 +9,7 @@ import privacidad
 import quiz
 import quiz_av
 import planes_av
+import mutati
 import servicios as pag_servicios   # alias: shell exporta una función servicios()
 
 OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "build")
@@ -60,16 +61,20 @@ def plan_head(num, name, tagline, desc, ringn, badge=False, white=False):
 
 
 def ctas(primary, secondary, href, white=False, href2=None):
-    """Los dos botones de un plan. El primero pide propuesta; el segundo enseña.
+    """Los botones de un plan. El primero pide propuesta; el segundo enseña.
 
     Llevan a sitios distintos desde que existe el cuestionario: uno abre el
     formulario con el plan en la URL y el otro baja a la sección de cierre.
+    Sin `secondary` sale solo el primero: diseño web no tiene todavía un sitio
+    real que enseñar, y un botón que no lleva a ninguno sobra.
     """
     p = "btn-w" if white else "btn-d"
     s = "btn-o" if white else "btn-l"
+    segundo = (f'<a href="{href2 or href}" class="{s}" style="{BTN};flex:1 1 190px">{T(secondary)}</a>'
+               if secondary else "")
     return (f'<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:4px">'
             f'<a href="{href}" class="{p}" style="{BTN};flex:1 1 190px">{T(primary)}</a>'
-            f'<a href="{href2 or href}" class="{s}" style="{BTN};flex:1 1 190px">{T(secondary)}</a></div>')
+            f'{segundo}</div>')
 
 
 def ideal(text, white=False):
@@ -115,8 +120,7 @@ def page_web():
                         "Sitio de presencia profesional, hecho a medida desde cero. Sin plantillas, "
                         "sin constructores genéricos.", 1)
             + statbar([stat("5", "secciones"), stat("1", "ronda de revisiones")])
-            + ctas("Solicitar propuesta", "Ver un sitio real", cta + "?plan=Web-Essential",
-                   href2="#propuesta") + '</div>')
+            + ctas("Solicitar propuesta", None, cta + "?plan=Web-Essential") + '</div>')
     right = (f'<div style="{COL_R}">' + block("Incluye", WEB_ESSENTIAL_INCLUYE)
              + ideal("Profesionales, estudios y negocios que necesitan una presencia digital seria y bien construida.")
              + '</div>')
@@ -128,8 +132,7 @@ def page_web():
                         "Todo lo de Essential, más profundidad de contenido, movimiento y capacidad de gestión.",
                         2, badge=True)
             + statbar([stat("12", "páginas"), stat("2", "rondas de revisiones")])
-            + ctas("Solicitar propuesta", "Ver un sitio real", cta + "?plan=Web-Premium",
-                   href2="#propuesta") + '</div>')
+            + ctas("Solicitar propuesta", None, cta + "?plan=Web-Premium") + '</div>')
     right = (f'<div style="{COL_R}">'
              + inherit_box("Todo lo del plan Web Essential", WEB_INHERIT_PREMIUM, 1)
              + block("Suma a Essential", WEB_PREMIUM_SUMA)
@@ -144,8 +147,8 @@ def page_web():
                         "Desarrollo a medida: el sitio deja de ser una vitrina y pasa a ser infraestructura de negocio.",
                         3, white=True)
             + statbar([stat("3", "rondas", True), stat("6", "meses de soporte", True)], white=True)
-            + ctas("Solicitar propuesta", "Ver una plataforma real", cta + "?plan=Web-Edition",
-                   white=True, href2="#propuesta") + '</div>')
+            + ctas("Solicitar propuesta", None, cta + "?plan=Web-Edition",
+                   white=True) + '</div>')
     grp = "".join(block(t, items, white=True) for t, items in WEB_EDITION_GROUPS)
     right = (f'<div style="{COL_R}">'
              + inherit_box("Todo lo del plan Web Premium", WEB_INHERIT_EDITION, 2, white=True)
@@ -607,6 +610,10 @@ def main():
                        for x in ("configurador", "configurator", "cuestionario", "brief")):
                 urls.append("/" + destino.replace("index.html", ""))
     usar(ORIGEN)
+
+    # Página temporal para un cliente: fuera del sitemap y sin versión inglesa.
+    pages["mutati/index.html"] = mutati.page()
+    pages["mutati/recibido/index.html"] = mutati.recibido()
 
     pages["sitemap.xml"] = _sitemap(sorted(set(urls)))
     pages["robots.txt"] = ("User-agent: *\nAllow: /\n\n"
