@@ -91,7 +91,6 @@ const REGLAS: Record<string, Regla[]> = {
     ["packagingScope", (a) => tiene(a, "touchpoints", PACKAGING)],
     ["spaces", (a) => tiene(a, "touchpoints", PREMISES) || tiene(a, "touchpoints", SIGNAGE)],
     ["languages"],
-    ["approvers"],
   ],
 };
 
