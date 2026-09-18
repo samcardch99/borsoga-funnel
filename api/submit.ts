@@ -18,6 +18,8 @@
  *     Perder un lead es peor que dar un error.
  */
 
+import { cors } from "./_cors.js";
+
 const MAX_FILES = 20;
 
 const STRUCT_WALLS = "Se mueven o se quitan paredes";
@@ -159,6 +161,7 @@ function sanitize(a: Answers): Answers {
 export const config = { maxDuration: 30 };
 
 export default async function handler(req: any, res: any) {
+  if (cors(req, res)) return;
   res.setHeader("cache-control", "no-store");
   const json = (body: any, status = 200) => { res.status(status).json(body); };
 
