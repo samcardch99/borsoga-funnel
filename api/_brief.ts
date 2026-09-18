@@ -247,7 +247,7 @@ export function noteBody(a: A, service: string, plan: string, rt: string[], file
   return [
     ...comun, ...propio,
     row("Ejes", Object.entries(a.axes || {}).map(([i, n]) => `${Number(i) + 1}:${n}/5`).join(" · ")),
-    files.length ? `\n**Archivos (privados):**\n${files.map((f: any) => `- ${f.kind}: ${f.url}`).join("\n")}\n` : "",
+    files.length ? `\n**Archivos:**\n${files.map((f: any) => `- ${f.kind}: ${f.url}`).join("\n")}\n` : "",
     fl.length ? `\n**Señales:**\n${fl.map((x) => `- ${x}`).join("\n")}\n` : "",
     `\n_${rt[2]}_`,
   ].join("");

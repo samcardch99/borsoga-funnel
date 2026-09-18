@@ -140,6 +140,9 @@ function validarContacto(a: Answers): string | null {
   return null;
 }
 
+const escHtml = (s: string) =>
+  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
 /** Recorta a lo que cabe en una columna de texto y evita cargas absurdas. */
 const trim = (v: any, n = 400) => (typeof v === "string" ? v.slice(0, n) : v);
 function sanitize(a: Answers): Answers {
@@ -207,15 +210,20 @@ export default async function handler(req: any, res: any) {
   // ---------------------------------------------------------------- archivos
   // Solo referencias. Validamos que apunten a nuestro store y nada más:
   // el cliente no puede colar una URL arbitraria en el aviso al estudio.
+  //
+  // Los archivos son privados, así que su URL de Blob da 403 fuera del
+  // servidor. `url` pasa a ser el enlace firmado a /api/file/, que es lo que
+  // pintan el correo y las notas del CRM; `blob` guarda la ruta en el store.
+  const { leadPath, fileLink } = await import("./_files.js");
   const fileErrors: string[] = [];
-  const files = uploads.filter((u) => {
-    const ok = u && typeof u.url === "string" &&
-      /^https:\/\/[a-z0-9-]+\.(public\.)?blob\.vercel-storage\.com\//.test(u.url) &&
-      ["photos", "planFiles", "applianceFiles",
-       "brandFiles", "refFiles", "currentFiles", "spaceFiles"].includes(u.kind);
-    if (!ok) fileErrors.push(`referencia de archivo descartada: ${String(u?.name).slice(0, 60)}`);
-    return ok;
-  }).map((u) => ({ kind: u.kind, name: String(u.name).slice(0, 200), url: u.url, size: Number(u.size) || 0 }));
+  const files = uploads.flatMap((u) => {
+    const path = leadPath(u?.url, u?.kind);
+    if (!path) {
+      fileErrors.push(`referencia de archivo descartada: ${escHtml(String(u?.name).slice(0, 60))}`);
+      return [];
+    }
+    return [{ kind: u.kind, name: String(u.name).slice(0, 200), url: fileLink(path), blob: path, size: Number(u.size) || 0 }];
+  });
 
   // ---------------------------------------------------------------- guardado
   let leadId: number | null = null;
@@ -335,7 +343,7 @@ ${line("Sin definir", unsureCount(a))}`}
 ${line("Archivos", files.length)}
 ${line("Lead", leadId)}${line("CRM", crm.opportunityId ? "oportunidad creada" : `⚠ ${crm.error}`)}
 </table>
-${files.length ? `<p><strong>Archivos (privados):</strong><br>${files.map((f: any) => f.url).join("<br>")}</p>` : ""}
+${files.length ? `<p><strong>Archivos:</strong><br>${files.map((f: any) => `<a href="${f.url}">${escHtml(f.name)}</a>`).join("<br>")}</p>` : ""}
 ${fileErrors.length ? `<p style="color:#b00">Archivos con problema:<br>${fileErrors.join("<br>")}</p>` : ""}
 ${dbError ? `<p style="color:#b00"><strong>No se guardó en la base de datos:</strong> ${dbError}${backupUrl ? `<br>Copia en Blob: ${backupUrl}` : "<br>Este correo es la única copia. Guárdalo."}</p>` : ""}
 <pre style="background:#f6f6f6;padding:14px;overflow:auto;font-size:12px">${JSON.stringify(a, null, 1).replace(/</g, "&lt;").slice(0, 12000)}</pre>

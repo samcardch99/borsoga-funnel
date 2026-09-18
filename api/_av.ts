@@ -171,7 +171,7 @@ export function noteBody(a: A, picked: string, rt: string[], files: any[]) {
     row("Firma", a.signer === "Como empresa"
       ? `Empresa: ${a.entName} (${a.entState}) — firma ${a.entSigner}, ${a.entRole}`
       : "A título personal"),
-    files.length ? `\n**Archivos (privados):**\n${files.map((f: any) => `- ${f.url}`).join("\n")}\n` : "",
+    files.length ? `\n**Archivos:**\n${files.map((f: any) => `- ${f.url}`).join("\n")}\n` : "",
     fl.length ? `\n**Señales:**\n${fl.map((x) => `- ${x}`).join("\n")}\n` : "",
     `\n_Ruta: ${rt[0]}. ${rt[2]}_`,
   ].join("");

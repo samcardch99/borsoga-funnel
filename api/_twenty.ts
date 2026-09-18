@@ -142,7 +142,7 @@ function noteBody(a: Answers, d: any, plan: string, rt: string[], files: any[]) 
     row("Dueño", a.isOwner === "Sí" ? "Es el dueño" : `Representante · dueño: ${a.ownerName} ${a.ownerEmail}`),
     row("Permiso de portafolio", a.portfolio),
     row("Material", files.length ? `${files.length} archivo(s)` : (a.noMaterial ? "Todavía sin material" : "—")),
-    files.length ? `\n**Archivos (privados, requieren credenciales):**\n${files.map((f: any) => `- ${f.kind}: ${f.url}`).join("\n")}\n` : "",
+    files.length ? `\n**Archivos:**\n${files.map((f: any) => `- ${f.kind}: ${f.url}`).join("\n")}\n` : "",
     `\n_Ruta: ${rt[0]}. ${rt[2]}_`,
   ].join("");
 }
@@ -213,13 +213,16 @@ export async function pushToTwenty(
     const noteId = note?.data?.createNote?.id || note?.data?.id;
 
     // La nota solo es útil si cuelga del registro. Si esto falla, la nota
-    // queda suelta pero el lead ya está creado: no es motivo para fallar.
-    if (noteId && opportunityId) {
-      await post("/noteTargets", { noteId, opportunityId }, ac.signal).catch(() => {});
-    }
-    if (noteId && personId) {
-      await post("/noteTargets", { noteId, personId }, ac.signal).catch(() => {});
-    }
+    // queda suelta pero el lead ya está creado: no es motivo para fallar el
+    // envío, pero sí para dejarlo en el log. Los campos llevan el prefijo
+    // `target`: con `opportunityId` a secas Twenty rechazaba el vínculo, y como
+    // el error se descartaba, ninguna nota quedó enlazada desde el 1 de
+    // septiembre hasta el 16.
+    const vincular = (campo: string, id: string) =>
+      post("/noteTargets", { noteId, [campo]: id }, ac.signal)
+        .catch((e: any) => console.warn(`Twenty: no se pudo vincular la nota (${campo})`, e?.message));
+    if (noteId && opportunityId) await vincular("targetOpportunityId", opportunityId);
+    if (noteId && personId) await vincular("targetPersonId", personId);
 
     return { personId, opportunityId };
   } catch (e: any) {
