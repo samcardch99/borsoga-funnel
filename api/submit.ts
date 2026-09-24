@@ -18,7 +18,7 @@
  *     Perder un lead es peor que dar un error.
  */
 
-import { cors } from "./_cors.js";
+import { cors, isPreview } from "./_cors.js";
 
 const MAX_FILES = 20;
 
@@ -227,6 +227,14 @@ export default async function handler(req: any, res: any) {
     }
     return [{ kind: u.kind, name: String(u.name).slice(0, 200), url: fileLink(path), blob: path, size: Number(u.size) || 0 }];
   });
+
+  // ---------------------------------------------------------------- pruebas
+  // Envío desde una URL de prueba de un PR: ya pasó la misma validación que en
+  // producción, así que quien revisa el cambio ve si el formulario funciona.
+  // Aquí se para: nada de Postgres, Twenty ni correo.
+  if (isPreview(req)) {
+    return json({ ok: true, route: rt, id: null, files: files.length, backup: false, crm: false, preview: true });
+  }
 
   // ---------------------------------------------------------------- guardado
   let leadId: number | null = null;
