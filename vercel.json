@@ -33,13 +33,208 @@
   ],
   "redirects": [
     {
+      "source": "/",
+      "destination": "https://borsogastudio.com/plans/es/",
+      "permanent": true
+    },
+    {
+      "source": "/en",
+      "destination": "https://borsogastudio.com/plans/",
+      "permanent": true
+    },
+    {
+      "source": "/en/",
+      "destination": "https://borsogastudio.com/plans/",
+      "permanent": true
+    },
+    {
+      "source": "/interior-design",
+      "destination": "https://borsogastudio.com/plans/es/interior-design/",
+      "permanent": true
+    },
+    {
+      "source": "/interior-design/",
+      "destination": "https://borsogastudio.com/plans/es/interior-design/",
+      "permanent": true
+    },
+    {
+      "source": "/en/interior-design",
+      "destination": "https://borsogastudio.com/plans/interior-design/",
+      "permanent": true
+    },
+    {
+      "source": "/en/interior-design/",
+      "destination": "https://borsogastudio.com/plans/interior-design/",
+      "permanent": true
+    },
+    {
+      "source": "/configurador",
+      "destination": "https://borsogastudio.com/plans/es/configurador/",
+      "permanent": true
+    },
+    {
+      "source": "/configurador/",
+      "destination": "https://borsogastudio.com/plans/es/configurador/",
+      "permanent": true
+    },
+    {
+      "source": "/en/configurator",
+      "destination": "https://borsogastudio.com/plans/configurator/",
+      "permanent": true
+    },
+    {
+      "source": "/en/configurator/",
+      "destination": "https://borsogastudio.com/plans/configurator/",
+      "permanent": true
+    },
+    {
+      "source": "/planes-av",
+      "destination": "https://borsogastudio.com/plans/es/planes-av/",
+      "permanent": true
+    },
+    {
+      "source": "/planes-av/",
+      "destination": "https://borsogastudio.com/plans/es/planes-av/",
+      "permanent": true
+    },
+    {
+      "source": "/en/av-plans",
+      "destination": "https://borsogastudio.com/plans/av-plans/",
+      "permanent": true
+    },
+    {
+      "source": "/en/av-plans/",
+      "destination": "https://borsogastudio.com/plans/av-plans/",
+      "permanent": true
+    },
+    {
+      "source": "/configurador-av",
+      "destination": "https://borsogastudio.com/plans/es/configurador-av/",
+      "permanent": true
+    },
+    {
+      "source": "/configurador-av/",
+      "destination": "https://borsogastudio.com/plans/es/configurador-av/",
+      "permanent": true
+    },
+    {
+      "source": "/en/av-configurator",
+      "destination": "https://borsogastudio.com/plans/av-configurator/",
+      "permanent": true
+    },
+    {
+      "source": "/en/av-configurator/",
+      "destination": "https://borsogastudio.com/plans/av-configurator/",
+      "permanent": true
+    },
+    {
+      "source": "/diseno-web",
+      "destination": "https://borsogastudio.com/plans/es/diseno-web/",
+      "permanent": true
+    },
+    {
+      "source": "/diseno-web/",
+      "destination": "https://borsogastudio.com/plans/es/diseno-web/",
+      "permanent": true
+    },
+    {
+      "source": "/en/web-design",
+      "destination": "https://borsogastudio.com/plans/web-design/",
+      "permanent": true
+    },
+    {
+      "source": "/en/web-design/",
+      "destination": "https://borsogastudio.com/plans/web-design/",
+      "permanent": true
+    },
+    {
+      "source": "/diseno-grafico",
+      "destination": "https://borsogastudio.com/plans/es/diseno-grafico/",
+      "permanent": true
+    },
+    {
+      "source": "/diseno-grafico/",
+      "destination": "https://borsogastudio.com/plans/es/diseno-grafico/",
+      "permanent": true
+    },
+    {
+      "source": "/en/graphic-design",
+      "destination": "https://borsogastudio.com/plans/graphic-design/",
+      "permanent": true
+    },
+    {
+      "source": "/en/graphic-design/",
+      "destination": "https://borsogastudio.com/plans/graphic-design/",
+      "permanent": true
+    },
+    {
+      "source": "/cuestionario-web",
+      "destination": "https://borsogastudio.com/plans/es/cuestionario-web/",
+      "permanent": true
+    },
+    {
+      "source": "/cuestionario-web/",
+      "destination": "https://borsogastudio.com/plans/es/cuestionario-web/",
+      "permanent": true
+    },
+    {
+      "source": "/en/web-brief",
+      "destination": "https://borsogastudio.com/plans/web-brief/",
+      "permanent": true
+    },
+    {
+      "source": "/en/web-brief/",
+      "destination": "https://borsogastudio.com/plans/web-brief/",
+      "permanent": true
+    },
+    {
+      "source": "/cuestionario-grafico",
+      "destination": "https://borsogastudio.com/plans/es/cuestionario-grafico/",
+      "permanent": true
+    },
+    {
+      "source": "/cuestionario-grafico/",
+      "destination": "https://borsogastudio.com/plans/es/cuestionario-grafico/",
+      "permanent": true
+    },
+    {
+      "source": "/en/graphic-brief",
+      "destination": "https://borsogastudio.com/plans/graphic-brief/",
+      "permanent": true
+    },
+    {
+      "source": "/en/graphic-brief/",
+      "destination": "https://borsogastudio.com/plans/graphic-brief/",
+      "permanent": true
+    },
+    {
+      "source": "/politica-de-privacidad",
+      "destination": "https://borsogastudio.com/plans/es/politica-de-privacidad/",
+      "permanent": true
+    },
+    {
+      "source": "/politica-de-privacidad/",
+      "destination": "https://borsogastudio.com/plans/es/politica-de-privacidad/",
+      "permanent": true
+    },
+    {
+      "source": "/en/privacy-policy",
+      "destination": "https://borsogastudio.com/plans/privacy-policy/",
+      "permanent": true
+    },
+    {
+      "source": "/en/privacy-policy/",
+      "destination": "https://borsogastudio.com/plans/privacy-policy/",
+      "permanent": true
+    },
+    {
       "source": "/visualizacion",
-      "destination": "/interior-design/",
+      "destination": "https://borsogastudio.com/plans/es/interior-design/",
       "permanent": true
     },
     {
       "source": "/visualizacion/",
-      "destination": "/interior-design/",
+      "destination": "https://borsogastudio.com/plans/es/interior-design/",
       "permanent": true
     }
   ]

@@ -1,5 +1,11 @@
 # Borsoga Funnel
 
+> **Las páginas ya no se sirven desde aquí.** Viven en
+> `borsogastudio.com/plans/` (repo `borsoga-studio`) y las de este dominio
+> redirigen allí (`vercel.json`). Este proyecto sigue en producción por
+> **`/api/*`**, el backend de todos los formularios, y por `/mutati/`.
+> No darlo de baja.
+
 Funnel de ventas de [Borsoga Studio](https://plans.borsogastudio.com). Sitio
 estático bilingüe generado con Python, más tres funciones sin servidor que
 recogen los leads.
