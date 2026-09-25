@@ -20,16 +20,46 @@ a { color: inherit; }
 
 .barra {
   position: sticky; top: 0; z-index: 20;
-  display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  padding: 12px 24px; background: var(--tinta); color: #fff;
+  background: rgba(17,17,17,.96); color: #fff;
+  -webkit-backdrop-filter: saturate(160%) blur(10px); backdrop-filter: saturate(160%) blur(10px);
+  border-bottom: 1px solid rgba(255,255,255,.08);
 }
-.marca { font-weight: 700; letter-spacing: .02em; text-decoration: none; }
-.marca span { font-weight: 400; opacity: .6; margin-left: 4px; }
-.barra-der { display: flex; align-items: center; gap: 14px; font-size: 13px; }
-.barra-der .quien { opacity: .7; }
-.barra-der button { background: transparent; border: 1px solid rgba(255,255,255,.35); color: #fff; border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+.barra-in {
+  max-width: 1480px; margin: 0 auto; height: 64px; padding: 0 24px;
+  display: flex; align-items: center; gap: 28px;
+}
+.marca { display: flex; align-items: center; gap: 14px; text-decoration: none; color: #fff; flex-shrink: 0; }
+.marca img { height: 22px; width: auto; display: block; }
+.marca-sep { width: 1px; height: 18px; background: rgba(255,255,255,.25); }
+.marca-txt { font-size: 11px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: rgba(255,255,255,.62); white-space: nowrap; }
+.barra-nav { display: flex; align-items: center; gap: 4px; height: 100%; }
+.barra-nav a {
+  position: relative; display: flex; align-items: center; height: 100%; padding: 0 12px;
+  font-size: 14px; color: rgba(255,255,255,.65); text-decoration: none; transition: color .15s; white-space: nowrap;
+}
+.barra-nav a:hover { color: #fff; }
+.barra-nav a[aria-current=page] { color: #fff; }
+.barra-nav a[aria-current=page]::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 0; height: 2px; background: #fff; border-radius: 2px 2px 0 0; }
+.barra-der { margin-left: auto; display: flex; align-items: center; gap: 12px; font-size: 13px; }
+.avatar {
+  width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0;
+  background: #fff; color: #111; font-size: 13px; font-weight: 700; text-transform: uppercase;
+}
+.barra-der .quien { color: rgba(255,255,255,.72); max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.barra-der button {
+  background: transparent; border: 1px solid rgba(255,255,255,.28); color: #fff; border-radius: 999px;
+  padding: 5px 14px; cursor: pointer; font-size: 13px; transition: background .15s, border-color .15s;
+}
+.barra-der button:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.5); }
+@media (max-width: 760px) {
+  .barra-in { gap: 14px; padding: 0 16px; }
+  .marca-sep, .marca-txt, .barra-der .quien { display: none; }
+  .barra-nav a { padding: 0 8px; }
+  .barra-nav a:not(:first-child) { display: none; }
+}
 
-main { max-width: 1480px; margin: 0 auto; padding: 28px 24px 120px; }
+main { max-width: 1480px; margin: 0 auto; padding: 32px 24px 120px; }
+@media (max-width: 760px) { main { padding: 24px 16px 100px; } }
 .cargando { color: var(--suave); }
 h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -.01em; }
 h2 { font-size: 18px; margin: 0; }
@@ -129,7 +159,7 @@ input:focus, select:focus, textarea:focus { outline: 2px solid #111; outline-off
 .textos-generales summary { cursor: pointer; font-weight: 600; }
 .textos-generales .campo { margin-top: 14px; }
 
-.vista { position: sticky; top: 76px; background: var(--papel); border: 1px solid var(--linea); border-radius: 14px; overflow: hidden; }
+.vista { position: sticky; top: 84px; background: var(--papel); border: 1px solid var(--linea); border-radius: 14px; overflow: hidden; }
 .vista-cab { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--linea); font-size: 13px; }
 .vista iframe { display: block; width: 100%; height: calc(100vh - 150px); border: 0; background: #fff; }
 .seg { display: inline-flex; border: 1px solid var(--linea); border-radius: 999px; overflow: hidden; }

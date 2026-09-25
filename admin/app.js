@@ -6,8 +6,8 @@
 'use strict';
 
 var SERVICIOS = {
-  web: { nombre: 'Cuestionario de diseño web', ruta: { es: '/plans/es/cuestionario-web/', en: '/plans/web-brief/' } },
-  grafico: { nombre: 'Cuestionario de identidad de marca', ruta: { es: '/plans/es/cuestionario-grafico/', en: '/plans/graphic-brief/' } }
+  web: { nombre: 'Cuestionario de diseño web', corto: 'Diseño web', ruta: { es: '/plans/es/cuestionario-web/', en: '/plans/web-brief/' } },
+  grafico: { nombre: 'Cuestionario de identidad de marca', corto: 'Identidad de marca', ruta: { es: '/plans/es/cuestionario-grafico/', en: '/plans/graphic-brief/' } }
 };
 var WEB = location.hostname === 'localhost' ? 'http://localhost:4321' : 'https://borsogastudio.com';
 
@@ -133,12 +133,27 @@ function inicio() {
   window.addEventListener('message', mensajeVista);
 }
 
+function navegacion() {
+  var n = document.getElementById('nav');
+  n.innerHTML = '';
+  if (!S.yo) return;
+  var actual = location.hash.replace('#', '');
+  añadir(n, [
+    h('a', { href: '#', 'aria-current': !SERVICIOS[actual] ? 'page' : null }, 'Cuestionarios'),
+    Object.keys(SERVICIOS).map(function (k) {
+      return h('a', { href: '#' + k, 'aria-current': actual === k ? 'page' : null }, SERVICIOS[k].corto);
+    })
+  ]);
+}
+
 function cabecera() {
+  navegacion();
   var u = document.getElementById('usuario');
   u.innerHTML = '';
   if (!S.yo) return;
   añadir(u, [
-    h('span', { class: 'quien' }, S.yo),
+    h('span', { class: 'avatar', 'aria-hidden': 'true' }, S.yo.charAt(0)),
+    h('span', { class: 'quien', title: S.yo }, S.yo),
     h('button', { type: 'button', onclick: function () {
       api('logout', { method: 'POST' }).then(function () { S.yo = null; cabecera(); pantallaLogin(); });
     } }, 'Salir')
@@ -165,6 +180,7 @@ function pantallaLogin(error, email) {
 
 function ruta() {
   var s = location.hash.replace('#', '');
+  navegacion();
   if (S.timer) guardarYa();
   if (SERVICIOS[s]) return abrir(s);
   S.servicio = null;
@@ -185,7 +201,7 @@ function pantallaInicio() {
           h('div', null, f.cambios
             ? h('span', { class: 'chip cambios' }, 'Cambios sin publicar')
             : h('span', { class: 'chip ok' }, 'Publicado')),
-          h('div', { class: 'estado' }, 'Versión publicada: ' + f.publicada + (f.cambiado ? ' · Última edición ' + fecha(f.cambiado) + (f.por ? ' por ' + f.por : '') : '')));
+          h('div', { class: 'estado' }, 'Versión publicada: ' + f.publicada + (f.cambiado ? ' · Última edición ' + fecha(f.cambiado) + (f.por && f.por !== 'código' ? ' por ' + f.por : '') : '')));
       }))
     ]);
   }).catch(function (e) { if (e.message !== 'Sin sesión') aviso(e.message, true); });

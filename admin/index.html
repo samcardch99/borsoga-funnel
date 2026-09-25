@@ -10,8 +10,15 @@
 </head>
 <body>
   <header class="barra">
-    <a class="marca" href="/admin/">Borsoga <span>Panel</span></a>
-    <div class="barra-der" id="usuario"></div>
+    <div class="barra-in">
+      <a class="marca" href="/admin/" aria-label="Borsoga · Panel de contenidos">
+        <img src="/admin/logo.svg" alt="Borsoga" width="329" height="64">
+        <span class="marca-sep" aria-hidden="true"></span>
+        <span class="marca-txt">Panel de contenidos</span>
+      </a>
+      <nav class="barra-nav" id="nav" aria-label="Secciones"></nav>
+      <div class="barra-der" id="usuario"></div>
+    </div>
   </header>
   <main id="app"><p class="cargando">Cargando…</p></main>
   <div id="aviso" class="aviso" role="status" aria-live="polite" hidden></div>
