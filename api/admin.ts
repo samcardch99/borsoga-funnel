@@ -12,11 +12,10 @@
  *   form      GET   ?servicio=  borrador + versión publicada
  *   borrador  PUT   ?servicio=  {schema, rev}  guarda el borrador
  *   comprobar POST  ?servicio=  qué impide publicar el borrador
- *   publicar  POST  ?servicio=  {nota}  publica y lanza la compilación de la web
+ *   publicar  POST  ?servicio=  {nota}  publica: la web lo lee en vivo de /api/forms/
  *   versiones GET   ?servicio=
  *   version   GET   ?servicio=&version=
  *   restaurar POST  ?servicio=&version=  copia una versión al borrador
- *   despliegue GET  estado de la última compilación de la web
  *
  * Todo salvo login/callback exige sesión. Lo que escribe exige además la
  * cabecera `x-borsoga: 1` (un formulario de otra web no puede ponerla sin
@@ -29,8 +28,6 @@ import {
 } from "./_sesion.js";
 
 const PANEL = "https://admin.borsogastudio.com";
-const REPO = "samcardch99/borsoga-studio";
-const WORKFLOW = "deploy.yml";
 
 const origen = (req: any) => (esLocal(req) ? `http://${req.headers.host}` : PANEL);
 const volver = (req: any, q = "") => `${origen(req)}/admin/${q}`;
@@ -38,20 +35,6 @@ const volver = (req: any, q = "") => `${origen(req)}/admin/${q}`;
 function body(req: any) {
   if (typeof req.body === "string") { try { return JSON.parse(req.body); } catch { return null; } }
   return req.body || {};
-}
-
-async function github(path: string, init: RequestInit = {}) {
-  const token = process.env.GITHUB_DEPLOY_TOKEN;
-  if (!token) return { ok: false, status: 0, error: "GITHUB_DEPLOY_TOKEN no configurado", data: null as any };
-  const r = await fetch(`https://api.github.com/repos/${REPO}${path}`, {
-    ...init,
-    headers: { authorization: `Bearer ${token}`, accept: "application/vnd.github+json",
-               "x-github-api-version": "2022-11-28", ...(init.headers || {}) },
-  });
-  const text = await r.text();
-  let data: any = null;
-  try { data = text ? JSON.parse(text) : null; } catch { /* texto plano */ }
-  return { ok: r.ok, status: r.status, error: r.ok ? null : `GitHub ${r.status}: ${text.slice(0, 200)}`, data };
 }
 
 export const config = { maxDuration: 30 };
@@ -126,14 +109,6 @@ export default async function handler(req: any, res: any) {
     }
     if (op === "yo") return json({ email: quien });
 
-    if (op === "despliegue") {
-      const r = await github(`/actions/workflows/${WORKFLOW}/runs?per_page=1&branch=main`);
-      if (!r.ok) return json({ error: r.error });
-      const run = r.data?.workflow_runs?.[0];
-      return json(run ? { estado: run.status, resultado: run.conclusion, creado: run.created_at,
-                          actualizado: run.updated_at, url: run.html_url } : {});
-    }
-
     if (op === "forms") {
       const out = [];
       for (const s of ["web", "grafico"] as const) {
@@ -183,11 +158,7 @@ export default async function handler(req: any, res: any) {
       if (errores.length) return json({ error: "Hay que corregir el cuestionario antes de publicarlo.", errores }, 422);
       if (JSON.stringify(f.draft) === JSON.stringify(pub.schema)) return json({ error: "No hay cambios que publicar." }, 400);
       const n = await publicar(s, f.draft, quien, String(b.nota || "").slice(0, 300));
-      const d = await github(`/actions/workflows/${WORKFLOW}/dispatches`, {
-        method: "POST", body: JSON.stringify({ ref: "main" }),
-      });
-      if (!d.ok) console.error("panel: no se lanzó la compilación", d.error);
-      return json({ ok: true, version: n, compilacion: d.ok ? "lanzada" : d.error });
+      return json({ ok: true, version: n });
     }
 
     if (op === "versiones") return json({ versiones: await versiones(s) });

@@ -178,7 +178,7 @@ function pantallaInicio() {
     app().innerHTML = '';
     añadir(app(), [
       h('h1', null, 'Cuestionarios'),
-      h('p', { class: 'sub' }, 'Lo que publiques aquí sale en borsogastudio.com/plans unos minutos después.'),
+      h('p', { class: 'sub' }, 'Lo que publiques aquí sale en borsogastudio.com/plans en unos segundos.'),
       h('div', { class: 'tarjetas' }, (j.forms || []).map(function (f) {
         return h('a', { class: 'tarjeta', href: '#' + f.servicio },
           h('h2', null, SERVICIOS[f.servicio].nombre),
@@ -868,7 +868,7 @@ function dialogoPublicar() {
     } }, 'Publicar');
     añadir(caja, [
       h('h2', null, 'Publicar la versión ' + (S.publicada.version + 1)),
-      h('p', null, 'Estos cambios saldrán en la web en unos minutos:'),
+      h('p', null, 'Estos cambios saldrán en la web en unos segundos:'),
       h('ul', { class: 'cambios-lista' }, difs.map(function (d) { return h('li', null, d); })),
       faltaEn ? h('p', { class: 'candado' }, faltaEn + (faltaEn === 1 ? ' pregunta no tiene' : ' preguntas no tienen') + ' texto en inglés: en la página inglesa saldrán en español.') : null,
       h('div', { class: 'campo', style: 'margin-top:16px' }, h('label', null, 'Nota'), nota),
@@ -878,34 +878,16 @@ function dialogoPublicar() {
 }
 
 function publicado(m, r) {
-  var caja = m.caja;
-  var estado = h('p', null, r.compilacion === 'lanzada' ? 'Compilando la web…' : '');
-  caja.innerHTML = '';
-  añadir(caja, [
+  m.caja.innerHTML = '';
+  añadir(m.caja, [
     h('h2', null, 'Versión ' + r.version + ' publicada'),
-    r.compilacion === 'lanzada'
-      ? estado
-      : h('p', { class: 'error' }, 'La versión quedó guardada, pero no se pudo lanzar la compilación de la web (' + r.compilacion + '). Avisa a Sam.'),
-    h('p', { class: 'nota' }, 'Si no ves el cambio en la web, recarga con Cmd+Shift+R (Mac) o Ctrl+F5 (Windows): la caché puede tardar.'),
-    h('div', { class: 'pie' }, h('button', { type: 'button', class: 'boton', onclick: m.cerrar }, 'Cerrar'))
+    h('p', null, 'Ya está en la web: quien abra el cuestionario a partir de ahora ve esta versión.'),
+    h('p', { class: 'nota' }, 'Quien lo tuviera abierto sigue con la anterior hasta que recargue; sus envíos se validan contra la versión que rellenó.'),
+    h('div', { class: 'pie' },
+      h('a', { class: 'boton claro', href: WEB + SERVICIOS[S.servicio].ruta.es, target: '_blank', rel: 'noopener' }, 'Abrir en la web'),
+      h('button', { type: 'button', class: 'boton', onclick: m.cerrar }, 'Cerrar'))
   ]);
   abrir(S.servicio);
-  if (r.compilacion !== 'lanzada') return;
-  var inicio = Date.now();
-  (function mirar() {
-    if (!document.body.contains(estado)) return;
-    api('despliegue').then(function (d) {
-      if (d.estado === 'completed' && new Date(d.creado).getTime() > inicio - 60000) {
-        estado.textContent = d.resultado === 'success'
-          ? 'La web ya está actualizada.'
-          : 'La compilación falló (' + d.resultado + '). La web sigue con la versión anterior. Avisa a Sam.';
-        estado.className = d.resultado === 'success' ? '' : 'error';
-        return;
-      }
-      estado.textContent = 'Compilando la web… (' + Math.round((Date.now() - inicio) / 1000) + ' s)';
-      setTimeout(mirar, 8000);
-    }).catch(function () { setTimeout(mirar, 15000); });
-  })();
 }
 
 function dialogoHistorial() {

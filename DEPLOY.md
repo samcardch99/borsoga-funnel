@@ -190,8 +190,10 @@ Edita los cuestionarios de diseño web e identidad de marca y los publica.
 - **Datos:** tablas `forms` (borrador) y `form_versions` (versiones publicadas,
   inmutables) en el mismo Postgres que los leads. La primera lectura las crea y
   guarda como versión 1 los esquemas de `api/_semillas.ts`.
-- **Público:** `GET /api/forms/<web|grafico>/` lo lee la compilación de
-  borsogastudio.com. Publicar en el panel lanza `deploy.yml` de borsoga-studio.
+- **Público:** `GET /api/forms/<web|grafico>/` (CORS, 10 s de caché en el CDN).
+  La página del cuestionario lo pide al abrirse, así que publicar en el panel
+  sale en la web al momento, sin recompilar. La compilación también lo lee y deja
+  una copia de reserva dentro de la página por si la API no responde.
 - **Validación:** cada envío trae `version`; `submit.ts` valida contra esa
   versión (`_esquema.ts`). Sin `version` (páginas anteriores al panel) siguen
   valiendo las reglas de `_brief.ts`.
@@ -205,4 +207,3 @@ Variables de entorno (Production):
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Cliente OAuth «Panel admin» del proyecto de Google Cloud `borsoga-admin` (cuenta samcard1999@gmail.com) |
 | `ADMIN_EMAILS` | Correos con acceso, separados por comas. Mientras la app de Google esté en modo «Prueba», añádelos también como usuarios de prueba en Google Auth Platform → Público |
 | `ADMIN_SESSION_SECRET` | 32+ caracteres aleatorios (`openssl rand -hex 32`) |
-| `GITHUB_DEPLOY_TOKEN` | Token fine-grained de samcardch99, solo repo `borsoga-studio`, permiso **Actions: read and write** |
