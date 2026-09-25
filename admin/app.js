@@ -37,7 +37,7 @@ var TEXTOS = [
 
 var S = {
   yo: null, servicio: null, draft: null, rev: 0, publicada: null,
-  abierta: null, estado: '', problemas: [], vista: false, vistaLang: 'es', vistaVieja: false,
+  abierta: null, estado: '', problemas: [], ventana: null,
   timer: null, guardando: null
 };
 
@@ -213,7 +213,6 @@ function hayCambios() { return S.publicada && !igual(S.publicada.schema, S.draft
 // Cada edición marca el borrador como cambiado; se guarda solo, al segundo.
 function cambio(repintar) {
   S.estado = 'Sin guardar…';
-  S.vistaVieja = true;
   clearTimeout(S.timer);
   S.timer = setTimeout(guardarYa, 900);
   if (repintar) pintar(); else pintarEstado();
@@ -278,8 +277,6 @@ function pintarEstado() {
   if (pub) pub.disabled = !hayCambios();
   var des = document.getElementById('b-descartar');
   if (des) des.disabled = !hayCambios();
-  var act = document.getElementById('b-actualizar');
-  if (act) act.textContent = S.vistaVieja ? 'Actualizar ●' : 'Actualizar';
 }
 
 function pintar() {
@@ -294,18 +291,18 @@ function pintar() {
         h('div', { class: 'estado' }, 'Versión publicada: ' + S.publicada.version + ' · ' + d.pasos.length + ' pasos · ' + todas().length + ' preguntas')),
       h('div', { class: 'acciones' },
         h('span', { id: 'estado', class: 'guardado' }, S.estado),
-        h('button', { type: 'button', class: 'boton claro', onclick: function () { S.vista = !S.vista; pintar(); } },
-          S.vista ? 'Ocultar vista previa' : 'Vista previa'),
+        h('div', { class: 'seg', title: 'Abre el borrador en otra pestaña, con el cuestionario real' },
+          h('button', { type: 'button', 'aria-pressed': 'false', onclick: function () { abrirVista('es'); } }, 'Vista previa ES'),
+          h('button', { type: 'button', 'aria-pressed': 'false', onclick: function () { abrirVista('en'); } }, 'EN')),
         h('button', { type: 'button', class: 'boton claro', onclick: dialogoHistorial }, 'Historial'),
         h('button', { type: 'button', id: 'b-descartar', class: 'boton claro', disabled: !hayCambios(), onclick: descartar }, 'Descartar cambios'),
         h('button', { type: 'button', id: 'b-publicar', class: 'boton', disabled: !hayCambios(), onclick: dialogoPublicar }, 'Publicar…'))),
     cajaProblemas(),
-    h('div', { class: 'rejilla' + (S.vista ? ' con-vista' : '') },
+    h('div', { class: 'rejilla' },
       h('div', null,
         textosGenerales(),
         d.pasos.map(pintarPaso),
-        h('button', { type: 'button', class: 'boton claro', onclick: nuevoPaso }, '+ Añadir paso')),
-      S.vista && panelVista())
+        h('button', { type: 'button', class: 'boton claro', onclick: nuevoPaso }, '+ Añadir paso')))
   ]);
   pintarEstado();
   window.scrollTo(0, y);
@@ -748,35 +745,20 @@ function editorCondiciones(q, i, j) {
 }
 
 // ------------------------------------------------------------ vista previa
-function urlVista() {
-  return WEB + SERVICIOS[S.servicio].ruta[S.vistaLang] + '?vista=1';
-}
-function panelVista() {
-  S.vistaVieja = false;
-  return h('aside', { class: 'vista' },
-    h('div', { class: 'vista-cab' },
-      h('strong', null, 'Vista previa del borrador'),
-      h('div', { class: 'linea', style: 'gap:8px' },
-        h('div', { class: 'seg' }, ['es', 'en'].map(function (l) {
-          return h('button', { type: 'button', 'aria-pressed': S.vistaLang === l ? 'true' : 'false', onclick: function () {
-            S.vistaLang = l; pintar();
-          } }, l.toUpperCase());
-        })),
-        h('button', { type: 'button', id: 'b-actualizar', class: 'boton claro mini', onclick: recargarVista }, 'Actualizar'))),
-    h('iframe', { id: 'vista', src: urlVista(), title: 'Vista previa' }));
-}
-function recargarVista() {
-  var f = document.getElementById('vista');
-  if (!f) return;
-  S.vistaVieja = false;
-  pintarEstado();
-  f.src = urlVista() + '&t=' + Date.now();
+// En otra pestaña, no en un iframe: el CDN de Hostinger manda
+// X-Frame-Options: SAMEORIGIN y borsogastudio.com no se deja incrustar aquí.
+// La página (?vista=1) avisa con 'borsoga-lista' y se le manda el borrador.
+// Volver a pulsar el botón recarga esa misma pestaña con el borrador de ahora.
+// El borrador viaja desde la memoria de esta pestaña: no hace falta esperar a
+// que se guarde, y abrir la pestaña dentro del clic evita el bloqueador.
+function abrirVista(lang) {
+  S.ventana = window.open(WEB + SERVICIOS[S.servicio].ruta[lang] + '?vista=1&t=' + Date.now(), 'borsoga-vista');
+  if (!S.ventana) aviso('El navegador bloqueó la pestaña de vista previa. Permite ventanas emergentes para este sitio.', true);
 }
 function mensajeVista(e) {
-  var f = document.getElementById('vista');
-  if (!f || e.source !== f.contentWindow || e.origin !== WEB) return;
+  if (!S.ventana || e.source !== S.ventana || e.origin !== WEB) return;
   if (e.data && e.data.tipo === 'borsoga-lista') {
-    f.contentWindow.postMessage({ tipo: 'borsoga-esquema', schema: S.draft }, WEB);
+    S.ventana.postMessage({ tipo: 'borsoga-esquema', schema: S.draft }, WEB);
   }
 }
 
@@ -922,7 +904,6 @@ function restaurar(v, m) {
     S.rev = j.rev;
     S.estado = 'Guardado';
     S.abierta = null;
-    S.vistaVieja = true;
     pintar();
     comprobar();
     aviso('Versión ' + v + ' copiada al borrador.');
@@ -936,7 +917,7 @@ function descartar() {
   api('restaurar', { method: 'POST', q: { servicio: S.servicio, version: S.publicada.version }, body: { rev: S.rev } })
     .then(function (j) {
       if (!j.ok) return aviso(j.error, true);
-      S.draft = j.draft; S.rev = j.rev; S.estado = 'Guardado'; S.abierta = null; S.vistaVieja = true;
+      S.draft = j.draft; S.rev = j.rev; S.estado = 'Guardado'; S.abierta = null;
       pintar(); comprobar();
     }).catch(function (e) { aviso(e.message, true); });
 }
