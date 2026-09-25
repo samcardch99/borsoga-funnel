@@ -10,12 +10,18 @@
  *
  * Caché del CDN de Vercel: 10 s, y mientras se renueva sirve la anterior
  * (stale-while-revalidate). Publicar tarda como mucho eso en verse.
+ *
+ * CORS con `*`, no con la lista de _cors.ts: el CDN guarda UNA respuesta por
+ * URL, y si la primera petición llega sin Origin (la compilación, un curl) la
+ * guardaría sin permiso y el navegador la rechazaría. Son datos públicos, sin
+ * cookies: `*` es lo correcto aquí.
  */
-import { cors } from "./_cors.js";
 import { esServicio, publicado, version } from "./_forms.js";
 
 export default async function handler(req: any, res: any) {
-  if (cors(req, res)) return;
+  res.setHeader("access-control-allow-origin", "*");
+  res.setHeader("access-control-allow-methods", "GET, OPTIONS");
+  if (req.method === "OPTIONS") return res.status(204).end();
   res.setHeader("cache-control", "public, max-age=0, s-maxage=10, stale-while-revalidate=300");
   if (req.method !== "GET") return res.status(405).json({ error: "Método no permitido." });
   const s = String(req.query?.servicio || "");
