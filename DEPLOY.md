@@ -185,7 +185,7 @@ que aplicarlo en los dos sitios: ya nos mordió una vez con el texto de la ruta.
 Edita los cuestionarios de diseño web e identidad de marca y los publica.
 
 - **Interfaz:** `admin/` (HTML + JS sin dependencias), servida en `/admin/`; el
-  host `admin.borsogastudio.com` reescribe `/` a `/admin/` (vercel.json).
+  host `admin.borsogastudio.com` redirige `/` a `/admin/` (vercel.json; una reescritura no vale: el `index.html` estático de la raíz gana).
 - **API:** `api/admin.ts` (`/api/admin/<op>/`), sesión en `api/_sesion.ts`.
 - **Datos:** tablas `forms` (borrador) y `form_versions` (versiones publicadas,
   inmutables) en el mismo Postgres que los leads. La primera lectura las crea y

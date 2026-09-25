@@ -51,6 +51,17 @@
   "redirects": [
     {
       "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "admin.borsogastudio.com"
+        }
+      ],
+      "destination": "/admin/",
+      "permanent": false
+    },
+    {
+      "source": "/",
       "destination": "https://borsogastudio.com/plans/es/",
       "permanent": true,
       "missing": [
@@ -262,16 +273,6 @@
     }
   ],
   "rewrites": [
-    {
-      "source": "/",
-      "has": [
-        {
-          "type": "host",
-          "value": "admin.borsogastudio.com"
-        }
-      ],
-      "destination": "/admin/"
-    },
     {
       "source": "/api/forms/:servicio/",
       "destination": "/api/forms?servicio=:servicio"
