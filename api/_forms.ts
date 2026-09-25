@@ -10,9 +10,11 @@
  * vieja al borrador y publicarla como una nueva.
  */
 import type { Esquema } from "./_esquema.js";
+import type { Config } from "./_configurador.js";
 import { SEMILLAS } from "./_semillas.js";
 
-export const SERVICIOS = ["web", "grafico"] as const;
+export const SERVICIOS = ["web", "grafico", "interior", "av"] as const;
+export type Formulario = Esquema | Config;
 export type Servicio = (typeof SERVICIOS)[number];
 export const esServicio = (s: any): s is Servicio => SERVICIOS.includes(s);
 
@@ -65,13 +67,13 @@ export async function fila(s: Servicio) {
     await sembrar(sql, s);
     rows = await sql`select servicio, draft, draft_at, draft_by, rev, published from forms where servicio = ${s}`;
   }
-  return rows[0] as { servicio: Servicio; draft: Esquema; draft_at: string; draft_by: string | null; rev: number; published: number };
+  return rows[0] as { servicio: Servicio; draft: Formulario; draft_at: string; draft_by: string | null; rev: number; published: number };
 }
 
 // Las versiones no cambian nunca: se pueden guardar en memoria sin caducidad.
-const cacheVersiones = new Map<string, Esquema>();
+const cacheVersiones = new Map<string, Formulario>();
 
-export async function version(s: Servicio, v: number): Promise<Esquema | null> {
+export async function version(s: Servicio, v: number): Promise<Formulario | null> {
   const k = `${s}:${v}`;
   if (cacheVersiones.has(k)) return cacheVersiones.get(k)!;
   const sql = await db();
@@ -97,7 +99,7 @@ export async function versiones(s: Servicio) {
  * de entonces). Dos pestañas abiertas no se pisan en silencio. Devuelve la
  * revisión nueva, o null si otra ya lo había cambiado.
  */
-export async function guardarBorrador(s: Servicio, schema: Esquema, quien: string, base: number) {
+export async function guardarBorrador(s: Servicio, schema: Formulario, quien: string, base: number) {
   const sql = await db();
   await fila(s);
   const rows = await sql`update forms set draft = ${JSON.stringify(schema)}, draft_at = now(),
@@ -106,7 +108,7 @@ export async function guardarBorrador(s: Servicio, schema: Esquema, quien: strin
   return (rows[0]?.rev as number) ?? null;
 }
 
-export async function publicar(s: Servicio, schema: Esquema, quien: string, nota: string) {
+export async function publicar(s: Servicio, schema: Formulario, quien: string, nota: string) {
   const sql = await db();
   const [{ n }] = await sql`select coalesce(max(version), 0) + 1 as n from form_versions where servicio = ${s}`;
   await sql`insert into form_versions (servicio, version, schema, published_by, note)

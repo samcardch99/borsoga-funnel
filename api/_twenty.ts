@@ -124,7 +124,7 @@ function noteBody(a: Answers, d: any, plan: string, rt: string[], files: any[]) 
     row("Paredes y fachada", (a.structure || []).join(" · ")),
     row("HOA / asociación", a.hoa),
     row("Restricciones del edificio", a.elevator),
-    row("Tamaño", a.size >= 0 ? ["Compacto", "Estándar", "Amplio"][a.size] : ""),
+    row("Tamaño", d?.tamanoNombre ?? (a.size >= 0 ? ["Compacto", "Estándar", "Amplio"][a.size] : "")),
     row("Pies cuadrados", a.sqft),
     row("Imágenes estimadas", d?.imageTotal),
     row("Nivel de acabado", a.finish),
@@ -136,10 +136,10 @@ function noteBody(a: Answers, d: any, plan: string, rt: string[], files: any[]) 
     row("Fecha límite", [a.deadline, a.deadlineDate, a.deadlineWhy].filter(Boolean).join(" · ")),
     row("Quién decide", a.decider),
     row("Contratista / arquitecto", a.pro),
-    row("Firma", a.signer === "Como empresa"
+    row("Firma", (d?.esEmpresa ?? a.signer === "Como empresa")
       ? `Empresa: ${a.entName} (${a.entState}) — firma ${a.entSigner}, ${a.entRole}`
       : "A título personal"),
-    row("Dueño", a.isOwner === "Sí" ? "Es el dueño" : `Representante · dueño: ${a.ownerName} ${a.ownerEmail}`),
+    row("Dueño", !(d?.esRepresentante ?? a.isOwner !== "Sí") ? "Es el dueño" : `Representante · dueño: ${a.ownerName} ${a.ownerEmail}`),
     row("Permiso de portafolio", a.portfolio),
     row("Material", files.length ? `${files.length} archivo(s)` : (a.noMaterial ? "Todavía sin material" : "—")),
     files.length ? `\n**Archivos:**\n${files.map((f: any) => `- ${f.kind}: ${f.url}`).join("\n")}\n` : "",

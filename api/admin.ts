@@ -22,7 +22,12 @@
  * disparar CORS, que aquí no se concede) y, si hay Origin, que sea el nuestro.
  */
 import { erroresEsquema, type Esquema } from "./_esquema.js";
-import { esServicio, fila, guardarBorrador, publicar, publicado, version, versiones } from "./_forms.js";
+import { erroresConfig, type Config } from "./_configurador.js";
+import { esServicio, fila, guardarBorrador, publicar, publicado, SERVICIOS, version, versiones, type Formulario } from "./_forms.js";
+
+/** Cuestionario (formato 1) o configurador (formato 2): cada uno con sus reglas. */
+const errores = (f: Formulario, anterior: Formulario | null) =>
+  (f as any)?.formato === 2 ? erroresConfig(f as Config, anterior as Config) : erroresEsquema(f as Esquema, anterior as Esquema);
 import {
   borrarEstado, borrarSesion, cookieSesion, esLocal, estadoValido, nuevoEstado, permitidos, sesion,
 } from "./_sesion.js";
@@ -111,7 +116,7 @@ export default async function handler(req: any, res: any) {
 
     if (op === "forms") {
       const out = [];
-      for (const s of ["web", "grafico"] as const) {
+      for (const s of SERVICIOS) {
         const f = await fila(s);
         const pub = await version(s, f.published);
         out.push({ servicio: s, publicada: f.published, rev: f.rev, cambiado: f.draft_at, por: f.draft_by,
@@ -131,10 +136,10 @@ export default async function handler(req: any, res: any) {
 
     if (op === "borrador" && req.method === "PUT") {
       const b = body(req);
-      if (!b?.schema?.pasos) return json({ error: "Borrador mal formado." }, 400);
+      if (!b?.schema?.pasos && !b?.schema?.listas) return json({ error: "Borrador mal formado." }, 400);
       if (JSON.stringify(b.schema).length > 400_000) return json({ error: "El cuestionario es demasiado grande." }, 413);
       b.schema.servicio = s;
-      const rev = await guardarBorrador(s, b.schema as Esquema, quien, Number(b.rev));
+      const rev = await guardarBorrador(s, b.schema as Formulario, quien, Number(b.rev));
       if (rev == null) {
         const f = await fila(s);
         return json({ error: `Otra persona (${f.draft_by || "alguien"}) cambió el borrador mientras lo editabas.`,
@@ -146,7 +151,7 @@ export default async function handler(req: any, res: any) {
     if (op === "comprobar" && escribe) {
       const f = await fila(s);
       const pub = await publicado(s);
-      return json({ errores: erroresEsquema(f.draft, pub.schema) });
+      return json({ errores: errores(f.draft, pub.schema) });
     }
 
     if (op === "publicar" && escribe) {
@@ -154,8 +159,8 @@ export default async function handler(req: any, res: any) {
       const f = await fila(s);
       if (Number(b.rev) !== f.rev) return json({ error: "El borrador cambió desde que lo cargaste. Recarga antes de publicar." }, 409);
       const pub = await publicado(s);
-      const errores = erroresEsquema(f.draft, pub.schema);
-      if (errores.length) return json({ error: "Hay que corregir el cuestionario antes de publicarlo.", errores }, 422);
+      const fallos = errores(f.draft, pub.schema);
+      if (fallos.length) return json({ error: "Hay que corregirlo antes de publicarlo.", errores: fallos }, 422);
       if (JSON.stringify(f.draft) === JSON.stringify(pub.schema)) return json({ error: "No hay cambios que publicar." }, 400);
       const n = await publicar(s, f.draft, quien, String(b.nota || "").slice(0, 300));
       return json({ ok: true, version: n });

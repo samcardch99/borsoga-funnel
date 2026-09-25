@@ -7,7 +7,9 @@
 
 var SERVICIOS = {
   web: { nombre: 'Cuestionario de diseño web', corto: 'Diseño web', ruta: { es: '/plans/es/cuestionario-web/', en: '/plans/web-brief/' } },
-  grafico: { nombre: 'Cuestionario de identidad de marca', corto: 'Identidad de marca', ruta: { es: '/plans/es/cuestionario-grafico/', en: '/plans/graphic-brief/' } }
+  grafico: { nombre: 'Cuestionario de identidad de marca', corto: 'Identidad de marca', ruta: { es: '/plans/es/cuestionario-grafico/', en: '/plans/graphic-brief/' } },
+  interior: { nombre: 'Configurador de interiorismo', corto: 'Interiorismo', ruta: { es: '/plans/es/configurador/', en: '/plans/configurator/' } },
+  av: { nombre: 'Configurador AV', corto: 'AV', ruta: { es: '/plans/es/configurador-av/', en: '/plans/av-configurator/' } }
 };
 var WEB = location.hostname === 'localhost' ? 'http://localhost:4321' : 'https://borsogastudio.com';
 
@@ -139,7 +141,7 @@ function navegacion() {
   if (!S.yo) return;
   var actual = location.hash.replace('#', '');
   añadir(n, [
-    h('a', { href: '#', 'aria-current': !SERVICIOS[actual] ? 'page' : null }, 'Cuestionarios'),
+    h('a', { href: '#', 'aria-current': !SERVICIOS[actual] ? 'page' : null }, 'Formularios'),
     Object.keys(SERVICIOS).map(function (k) {
       return h('a', { href: '#' + k, 'aria-current': actual === k ? 'page' : null }, SERVICIOS[k].corto);
     })
@@ -193,7 +195,7 @@ function pantallaInicio() {
   api('forms').then(function (j) {
     app().innerHTML = '';
     añadir(app(), [
-      h('h1', null, 'Cuestionarios'),
+      h('h1', null, 'Formularios'),
       h('p', { class: 'sub' }, 'Lo que publiques aquí sale en borsogastudio.com/plans en unos segundos.'),
       h('div', { class: 'tarjetas' }, (j.forms || []).map(function (f) {
         return h('a', { class: 'tarjeta', href: '#' + f.servicio },
@@ -209,6 +211,7 @@ function pantallaInicio() {
 
 // ------------------------------------------------------------ editor
 function abrir(s) {
+  if (S.servicio !== s) { S.pestana = null; S.listaAbierta = null; S.filtroTextos = ''; }
   S.servicio = s;
   S.abierta = null;
   app().innerHTML = '<p class="cargando">Cargando…</p>';
@@ -300,11 +303,13 @@ function pintar() {
   app().innerHTML = '';
   var d = S.draft;
   añadir(app(), [
-    h('a', { class: 'volver', href: '#' }, '← Cuestionarios'),
+    h('a', { class: 'volver', href: '#' }, '← Formularios'),
     h('div', { class: 'cabecera' },
       h('div', null,
         h('h1', null, SERVICIOS[S.servicio].nombre),
-        h('div', { class: 'estado' }, 'Versión publicada: ' + S.publicada.version + ' · ' + d.pasos.length + ' pasos · ' + todas().length + ' preguntas')),
+        h('div', { class: 'estado' }, 'Versión publicada: ' + S.publicada.version + ' · ' + (esConfig()
+          ? Object.keys(d.listas).length + ' listas de opciones · ' + reglasTodas().length + ' reglas'
+          : d.pasos.length + ' pasos · ' + todas().length + ' preguntas'))),
       h('div', { class: 'acciones' },
         h('span', { id: 'estado', class: 'guardado' }, S.estado),
         h('div', { class: 'seg', title: 'Abre el borrador en otra pestaña, con el cuestionario real' },
@@ -315,7 +320,7 @@ function pintar() {
         h('button', { type: 'button', id: 'b-publicar', class: 'boton', disabled: !hayCambios(), onclick: dialogoPublicar }, 'Publicar…'))),
     cajaProblemas(),
     h('div', { class: 'rejilla' },
-      h('div', null,
+      esConfig() ? editorConfig() : h('div', null,
         textosGenerales(),
         d.pasos.map(pintarPaso),
         h('button', { type: 'button', class: 'boton claro', onclick: nuevoPaso }, '+ Añadir paso')))
@@ -760,6 +765,384 @@ function editorCondiciones(q, i, j) {
     conds.length ? h('div', { class: 'nota' }, 'Si deja de mostrarse, su respuesta se borra: el estudio solo recibe lo que el cliente pudo ver.') : null);
 }
 
+// ------------------------------------------------------------ configuradores
+// Interiorismo y AV (formato 2): listas de opciones con papel, grupo y marcas,
+// reglas (plan, respuesta, avisos), textos por paso y ajustes. El código de la
+// web encuentra las opciones por su PAPEL: esas no se borran, pero sí se
+// renombran y traducen.
+var ROLES = {
+  vivir: 'Proyecto para vivir', invertir: 'Proyecto para vender o rentar', comercial: 'Espacio comercial',
+  en_compra: 'En proceso de compra', otro: 'Pide escribir cuál', sin_local: 'Todavía sin local',
+  salud: 'Pregunta por el departamento de salud', casa: 'Es casa', condo: 'Es condominio',
+  nueva: 'Obra nueva', remodelacion: 'Remodelación', estructural: 'Obra estructural',
+  exclusiva: 'Excluye a las demás', decidido: 'Ya decidido (pide subir la lista)', ayuda: 'Pide ayuda',
+  elige_espacios: 'Pide elegir espacios', enlace: 'Pide enlace', ninguno: 'Ninguno (excluye a las demás)',
+  personal: 'A título personal', empresa: 'Como empresa (pide datos de la empresa)',
+  representante: 'Representante (pide datos del dueño)', explorando: 'Explorando (pregunta qué le decidiría)',
+  fija: 'Fecha fija (pide la fecha)', recomendar: 'Pide recomendación', hospitalidad: 'Hospitalidad',
+  mixto: 'Uso mixto', interior: 'Interior (despliega los espacios)', amenidad: 'Amenidad (despliega las amenidades)',
+  modelo: 'Modelo 3D', bocetos: 'Bocetos'
+};
+var MARCAS = {
+  interior: { espacios: { humedo: 'Tiene agua', cocina: 'Lleva electrodomésticos', lavanderia: 'Lavandería',
+                          barra: 'Barra', exterior: 'Exterior', piscina: 'Es la piscina' } },
+  av: { scenes: { contexto: 'Pregunta por el contexto urbano', pieza: 'Pregunta por la pieza' },
+        interiorDesign: { abierto: 'Interior sin resolver (oportunidad)' } }
+};
+var GRUPOS = {
+  interior: { espacios: { residencial: 'Residencial (siempre)', casa: 'Solo casas', condo: 'Solo condominios', comercial: 'Comercial' },
+              showcase: { vivir: 'Para vivir', invertir: 'Para vender o rentar', comercial: 'Comercial' } },
+  av: { rooms: { residencial: 'Residencial', comercial: 'Comercial', hospitalidad: 'Hospitalidad' } }
+};
+// Listas que son una respuesta (para las reglas "una respuesta…"). `true` = varias.
+var CAMPOS = {
+  interior: { projectType: 0, dealType: 0, ownership: 0, commercialType: 0, occupancy: 0, propertyType: 0, workType: 0,
+    stage: 0, year: 0, structure: 1, espacios: 1, keepFurniture: 0, pieces: 0, budget: 0, plumbing: 0, appliances: 0,
+    laundry: 0, laundryLayout: 0, barEquip: 0, pool: 0, hoa: 0, health: 0, finish: 0, clarity: 0, extras: 1,
+    showcase: 1, signer: 0, isOwner: 0, decider: 0, timing: 0, deadline: 0, pro: 0, portfolio: 0 },
+  av: { projectType: 0, stage: 0, role: 0, scenes: 1, context: 0, rooms: 1, amenities: 1, interiorDesign: 0, piece: 0,
+    material: 0, spec: 0, uses: 1, tone: 0, extras: 1, cross: 1, signer: 0, launch: 0, portfolio: 0 }
+};
+var CAMPO_DE = { espacios: 'spaces' };
+var campoDe = function (id) { return CAMPO_DE[id] || id; };
+var listaDe = function (f) { return f === 'spaces' ? 'espacios' : f; };
+var SENALES = {
+  interior: [
+    ['fuera_zona', 'Está fuera de las ciudades con cobertura', 'b'], ['fuera_florida', 'Está fuera de Florida', 'b'],
+    ['estructural', 'Mueve paredes o toca la fachada', 'b'], ['necesita_planos', 'Necesita planos (obra nueva o sin acceso)', 'b'],
+    ['obra_nueva', 'Es obra nueva', 'b'], ['es_casa', 'Es una casa', 'b'], ['es_condo', 'Es un condominio', 'b'],
+    ['comercial', 'Es un espacio comercial', 'b'], ['invertir', 'Es para vender o rentar', 'b'],
+    ['unidades', 'Número de espacios contando cantidades', 'n'], ['espacios', 'Número de tipos de espacio', 'n'],
+    ['extras', 'Número de extras', 'n'], ['sin_definir', 'Respuestas sin definir', 'n'], ['plan_elegido', 'Plan con el que llegó', 'p']
+  ],
+  av: [
+    ['sin_material', 'No tiene material del proyecto', 'b'], ['escenas', 'Número de escenas', 'n'],
+    ['extras', 'Número de extras', 'n'], ['dias_lanzamiento', 'Días hasta un lanzamiento con fecha fija', 'n'],
+    ['sin_definir', 'Respuestas sin definir', 'n'], ['plan_elegido', 'Plan con el que llegó', 'p'],
+    ['plan', 'Plan (el elegido o el recomendado)', 'p']
+  ]
+};
+var PLANES = ['Essential', 'Premium', 'Borsoga Edition'];
+// Postgres guarda los objetos sin su orden: las listas se enseñan en el del configurador.
+var ORDEN = {
+  interior: ['projectType', 'dealType', 'ownership', 'commercialType', 'occupancy', 'propertyType', 'workType', 'stage', 'year',
+    'structure', 'espacios', 'keepFurniture', 'pieces', 'tamano', 'budget', 'millwork', 'plumbing', 'appliances', 'laundry',
+    'laundryLayout', 'barEquip', 'pool', 'hoa', 'health', 'finish', 'clarity', 'extras', 'showcase', 'signer', 'isOwner',
+    'decider', 'timing', 'deadline', 'pro', 'portfolio'],
+  av: ['projectType', 'stage', 'role', 'scenes', 'context', 'rooms', 'amenities', 'interiorDesign', 'piece', 'material',
+    'spec', 'uses', 'tone', 'extras', 'cross', 'signer', 'launch', 'portfolio']
+};
+var enOrden = function (ids) {
+  var o = ORDEN[S.draft.servicio] || [];
+  return ids.slice().sort(function (a, b) { return (o.indexOf(a) + 1 || 999) - (o.indexOf(b) + 1 || 999); });
+};
+var TIPOS_RUTA = { call: 'Vamos a hablar (llamada)', range: 'Te enviamos un rango', mail: 'Recibimos tu proyecto' };
+var GRUPOS_TEXTO = { cabecera: 'Cabecera y botones', p1: 'Paso 1', p2: 'Paso 2', p3: 'Paso 3', p4: 'Paso 4', p5: 'Paso 5', p6: 'Paso 6', final: 'Pantalla final' };
+
+var esConfig = function (x) { return (x || S.draft).formato === 2; };
+var reglasTodas = function (C) { var R = (C || S.draft).reglas; return R.plan.concat(R.ruta, R.avisos || []); };
+
+function editorConfig() {
+  var P = [['opciones', 'Opciones'], ['reglas', 'Reglas'], ['textos', 'Textos'], ['ajustes', 'Ajustes']];
+  S.pestana = S.pestana || 'opciones';
+  return h('div', null,
+    h('div', { class: 'pestanas', role: 'tablist' }, P.map(function (p) {
+      return h('button', { type: 'button', role: 'tab', 'aria-selected': S.pestana === p[0] ? 'true' : 'false',
+        onclick: function () { S.pestana = p[0]; pintar(); } }, p[1]);
+    })),
+    S.pestana === 'opciones' ? pestanaOpciones()
+      : S.pestana === 'reglas' ? pestanaReglas()
+      : S.pestana === 'textos' ? pestanaTextos() : pestanaAjustes());
+}
+
+// ................................................................ opciones
+function pestanaOpciones() {
+  var L = S.draft.listas;
+  return h('div', null,
+    h('p', { class: 'nota', style: 'margin:0 0 14px' }, 'Las respuestas se guardan con el texto en español. Las opciones con 🔒 tienen un papel en el configurador: se pueden renombrar y traducir, pero no borrar. Si renombras una opción, las reglas que la usan se actualizan solas.'),
+    enOrden(Object.keys(L)).map(function (id) {
+      var l = L[id], abierta = S.listaAbierta === id;
+      return h('section', { class: 'paso' },
+        h('div', { class: 'p-fila', style: 'padding:14px 16px', onclick: function () { S.listaAbierta = abierta ? null : id; pintar(); } },
+          h('div', { class: 'p-texto' }, h('strong', null, l.nombre),
+            h('div', { class: 'p-meta' }, l.ops.length + ' opciones · ' + l.ops.slice(0, 4).map(function (o) { return o.es; }).join(', ') + (l.ops.length > 4 ? '…' : ''))),
+          h('span', { class: 'nota' }, abierta ? '▲' : '▼')),
+        abierta && h('div', { class: 'p-edit' }, editorLista(id, l)));
+    }));
+}
+
+function editorLista(id, l) {
+  var srv = S.draft.servicio;
+  var marcas = (MARCAS[srv] || {})[id], grupos = (GRUPOS[srv] || {})[id];
+  var tiene = function (k) { return l.ops.some(function (o) { return o[k] != null; }); };
+  var conN = tiene('n'), conDesc = tiene('desc'), conEtq = tiene('etiqueta'), conPlural = tiene('plural'), conSlot = tiene('slot');
+  var pub = S.publicada.schema.listas[id];
+  var rolesPub = {};
+  (pub ? pub.ops : []).forEach(function (o) { if (o.rol) rolesPub[o.rol] = 1; });
+
+  return [
+    h('div', { class: 'opciones' }, l.ops.map(function (o, k) {
+      var antes = o.es;
+      var fila = [
+        h('div', { class: 'opcion' },
+          h('div', { class: 'idioma', 'data-l': 'ES' }, h('input', { type: 'text', value: o.es,
+            oninput: function (e) { o.es = e.target.value; cambio(false); },
+            onchange: function (e) { renombrarEnReglas(id, antes, e.target.value); antes = e.target.value; } })),
+          h('div', { class: 'idioma', 'data-l': 'EN' }, h('input', { type: 'text', value: o.en || '', placeholder: 'English',
+            class: o.es && !o.en ? 'en-falta' : null,
+            oninput: function (e) { o.en = e.target.value; e.target.classList.toggle('en-falta', !e.target.value); cambio(false); } })),
+          h('div', { class: 'herr' },
+            o.rol && h('span', { class: 'candado', title: ROLES[o.rol] || o.rol }, '🔒'),
+            h('button', { type: 'button', class: 'icono', title: 'Subir', disabled: k === 0, onclick: function () { l.ops.splice(k - 1, 0, l.ops.splice(k, 1)[0]); cambio(true); } }, '↑'),
+            h('button', { type: 'button', class: 'icono', title: 'Bajar', disabled: k === l.ops.length - 1, onclick: function () { l.ops.splice(k + 1, 0, l.ops.splice(k, 1)[0]); cambio(true); } }, '↓'),
+            h('button', { type: 'button', class: 'icono', title: o.rol ? 'Tiene un papel en el configurador: no se puede quitar' : 'Quitar opción',
+              disabled: !!o.rol || l.ops.length <= 1, onclick: function () { quitarOpcionConfig(id, k); } }, '✕')))
+      ];
+      var extras = [];
+      if (o.rol) extras.push(h('span', { class: 'chip' }, ROLES[o.rol] || o.rol));
+      if (grupos) extras.push(h('label', { class: 'check' }, 'Grupo:', h('select', { style: 'width:auto', onchange: function (e) { o.grupo = e.target.value; cambio(false); } },
+        Object.keys(grupos).map(function (g) { return h('option', { value: g, selected: o.grupo === g ? true : null }, grupos[g]); }))));
+      if (marcas) Object.keys(marcas).forEach(function (m) {
+        extras.push(h('label', { class: 'check' }, h('input', { type: 'checkbox', checked: !!(o.marcas && o.marcas[m]), onchange: function (e) {
+          o.marcas = o.marcas || {};
+          if (e.target.checked) o.marcas[m] = true; else delete o.marcas[m];
+          if (!Object.keys(o.marcas).length) delete o.marcas;
+          cambio(false);
+        } }), marcas[m]));
+      });
+      if (conN) extras.push(h('label', { class: 'check' }, 'Imágenes por espacio:', h('input', { type: 'number', min: 1, max: 40, value: o.n || 1, style: 'width:80px',
+        oninput: function (e) { o.n = Math.max(1, parseInt(e.target.value, 10) || 1); cambio(false); } })));
+      extras.push(h('label', { class: 'check', title: 'Cuenta como respuesta sin definir (varias hacen que el lead vaya a rango)' },
+        h('input', { type: 'checkbox', checked: !!o.duda, onchange: function (e) { if (e.target.checked) o.duda = true; else delete o.duda; cambio(false); } }), 'Cuenta como «sin definir»'));
+      if (extras.length) fila.push(h('div', { class: 'linea', style: 'gap:12px;padding:2px 0 6px;font-size:13px' }, extras));
+      if (conDesc) fila.push(campo('Descripción', par(o, 'desc', { largo: true, opcional: true })));
+      if (conEtq) fila.push(campo('Etiqueta', par(o, 'etiqueta', { opcional: true })));
+      if (conSlot) fila.push(campo('Texto sobre la imagen', par(o, 'slot', { opcional: true })));
+      if (conPlural) fila.push(campo('Plural (para el resumen: «2 cocinas»)', par(o, 'plural', { opcional: true })));
+      return h('div', { style: 'border-bottom:1px solid var(--linea);padding:8px 0' }, fila);
+    })),
+    h('div', null, h('button', { type: 'button', class: 'boton claro mini', onclick: function () {
+      var nueva = { es: 'Nueva opción', en: '' };
+      if (grupos) nueva.grupo = Object.keys(grupos)[0];
+      if (conN) nueva.n = 3;
+      if (conPlural) nueva.plural = { es: '', en: '' };
+      l.ops.push(nueva);
+      cambio(true);
+    } }, '+ Añadir opción')),
+    Object.keys(rolesPub).some(function (r) { return !l.ops.some(function (o) { return o.rol === r; }); })
+      ? h('p', { class: 'error' }, 'Falta una opción con papel que había en la versión publicada.') : null
+  ];
+}
+
+function condicionesQueUsan(id, valor) {
+  var f = campoDe(id), out = [];
+  reglasTodas().forEach(function (r) {
+    (r.si || []).forEach(function (c) {
+      if (c.s === 'campo' && c.f === f && (c.v === valor || (Array.isArray(c.v) && c.v.indexOf(valor) > -1))) out.push({ r: r, c: c });
+    });
+  });
+  return out;
+}
+function renombrarEnReglas(id, viejo, nuevo) {
+  if (!viejo || viejo === nuevo) return;
+  condicionesQueUsan(id, viejo).forEach(function (x) {
+    if (x.c.v === viejo) x.c.v = nuevo;
+    else x.c.v = x.c.v.map(function (v) { return v === viejo ? nuevo : v; });
+  });
+  cambio(true);
+}
+function quitarOpcionConfig(id, k) {
+  var l = S.draft.listas[id], v = l.ops[k].es;
+  var usos = condicionesQueUsan(id, v);
+  if (usos.length && !confirm('La opción «' + v + '» se usa en ' + usos.length + ' condición(es) de las reglas. Si la quitas, esas condiciones se borran y, si una regla se queda sin condiciones, también la regla. ¿Seguir?')) return;
+  var R = S.draft.reglas;
+  var limpia = function (lista) {
+    return lista.filter(function (r) {
+      var antes = r.si.length;
+      r.si = r.si.filter(function (c) {
+        if (!(c.s === 'campo' && c.f === campoDe(id))) return true;
+        if (c.v === v) return false;
+        if (Array.isArray(c.v)) { c.v = c.v.filter(function (x) { return x !== v; }); return c.v.length > 0; }
+        return true;
+      });
+      return !(antes && !r.si.length);
+    });
+  };
+  R.plan = limpia(R.plan); R.ruta = limpia(R.ruta); if (R.avisos) R.avisos = limpia(R.avisos);
+  l.ops.splice(k, 1);
+  cambio(true);
+}
+
+// ................................................................ reglas
+function pestanaReglas() {
+  var R = S.draft.reglas;
+  return h('div', null,
+    h('section', { class: 'textos-generales' },
+      h('h2', null, 'Plan recomendado'),
+      h('p', { class: 'nota' }, 'Se prueban en orden; la primera que se cumple decide el plan. Solo cuenta para quien llega sin haber elegido plan.'),
+      listaReglas(R.plan, function (r) {
+        return h('label', { class: 'check' }, '→ Plan', h('select', { style: 'width:auto', onchange: function (e) { r.plan = e.target.value; cambio(false); } },
+          PLANES.map(function (p) { return h('option', { value: p, selected: r.plan === p ? true : null }, p); })));
+      }, function () { return { plan: 'Premium', si: [] }; }),
+      h('label', { class: 'check', style: 'margin-top:12px' }, 'Si no se cumple ninguna:', h('select', { style: 'width:auto', onchange: function (e) { R.planDefecto = e.target.value; cambio(false); } },
+        PLANES.map(function (p) { return h('option', { value: p, selected: R.planDefecto === p ? true : null }, p); })))),
+    h('section', { class: 'textos-generales' },
+      h('h2', null, 'Tipo de respuesta'),
+      h('p', { class: 'nota' }, 'Decide qué correo recibe el cliente y qué ve al terminar. Se prueban en orden; la primera que se cumple gana. En los textos puedes usar {unidades}, {espacios}, {escenas}…'),
+      listaReglas(R.ruta, function (r) {
+        return [
+          h('label', { class: 'check' }, '→', h('select', { style: 'width:auto', onchange: function (e) { r.tipo = e.target.value; cambio(false); } },
+            Object.keys(TIPOS_RUTA).map(function (t) { return h('option', { value: t, selected: r.tipo === t ? true : null }, TIPOS_RUTA[t]); }))),
+          campo('Texto', par(r, 'texto', { largo: true }))
+        ];
+      }, function () { return { tipo: 'call', si: [], texto: { es: '', en: '' } }; }),
+      h('div', { class: 'campo', style: 'margin-top:12px' }, h('label', null, 'Si no se cumple ninguna: ' + TIPOS_RUTA[R.rutaDefecto.tipo]), par(R.rutaDefecto, 'texto', { largo: true })),
+      h('details', { style: 'margin-top:12px' }, h('summary', null, 'Títulos de cada tipo de respuesta'),
+        Object.keys(TIPOS_RUTA).map(function (t) { return campo(TIPOS_RUTA[t], par(R.titulos, t)); }))),
+    R.avisos && S.draft.servicio === 'interior' ? h('section', { class: 'textos-generales' },
+      h('h2', null, 'Avisos del paso de extras'),
+      h('p', { class: 'nota' }, 'Un aviso que sugiere un plan mayor. Se enseña el primero que se cumple.'),
+      listaReglas(R.avisos, function (r) { return campo('Texto', par(r, 'texto', { largo: true })); },
+        function () { return { si: [], texto: { es: '', en: '' } }; })) : null);
+}
+
+function listaReglas(lista, cabeza, nueva) {
+  return h('div', { class: 'condiciones' },
+    lista.map(function (r, i) {
+      return h('div', { class: 'regla' },
+        h('div', { class: 'linea', style: 'justify-content:space-between' },
+          h('strong', null, (i + 1) + '.'),
+          h('div', { class: 'p-herr' },
+            h('button', { type: 'button', class: 'icono', title: 'Subir', disabled: i === 0, onclick: function () { lista.splice(i - 1, 0, lista.splice(i, 1)[0]); cambio(true); } }, '↑'),
+            h('button', { type: 'button', class: 'icono', title: 'Bajar', disabled: i === lista.length - 1, onclick: function () { lista.splice(i + 1, 0, lista.splice(i, 1)[0]); cambio(true); } }, '↓'),
+            h('button', { type: 'button', class: 'icono', title: 'Borrar regla', onclick: function () { if (confirm('¿Borrar esta regla?')) { lista.splice(i, 1); cambio(true); } } }, '✕'))),
+        h('div', { class: 'nota' }, r.si.length ? 'Si se cumple' + (r.si.length > 1 ? 'n todas:' : ':') : 'Sin condiciones: añade al menos una.'),
+        r.si.map(function (c, k) { return filaCondicion(r, c, k); }),
+        h('div', null, h('button', { type: 'button', class: 'boton claro mini', onclick: function () {
+          r.si.push({ s: SENALES[S.draft.servicio][0][0] }); cambio(true);
+        } }, '+ Condición')),
+        cabeza(r));
+    }),
+    h('div', null, h('button', { type: 'button', class: 'boton claro mini', onclick: function () { lista.push(nueva()); cambio(true); } }, '+ Añadir regla')));
+}
+
+function filaCondicion(r, c, k) {
+  var srv = S.draft.servicio, sen = SENALES[srv];
+  var tipo = c.s === 'campo' ? 'campo' : ((sen.filter(function (x) { return x[0] === c.s; })[0] || [])[2] || 'b');
+  var quitar = h('button', { type: 'button', class: 'icono', title: 'Quitar condición', onclick: function () { r.si.splice(k, 1); cambio(true); } }, '✕');
+  var que = h('select', { onchange: function (e) {
+    var v = e.target.value;
+    if (v === 'campo') { var f = Object.keys(CAMPOS[srv])[0]; r.si[k] = { s: 'campo', f: campoDe(f), op: CAMPOS[srv][f] ? 'incluye' : 'es', v: S.draft.listas[f].ops[0].es }; }
+    else {
+      var t = sen.filter(function (x) { return x[0] === v; })[0][2];
+      r.si[k] = t === 'b' ? { s: v } : t === 'n' ? { s: v, op: '>', v: 0 } : { s: v, op: 'es', v: PLANES[2] };
+    }
+    cambio(true);
+  } }, sen.map(function (x) { return h('option', { value: x[0], selected: c.s === x[0] ? true : null }, x[1]); }),
+     h('option', { value: 'campo', selected: c.s === 'campo' ? true : null }, 'Una respuesta…'));
+
+  var resto = [];
+  if (tipo === 'b') {
+    resto.push(h('select', { onchange: function (e) { if (e.target.value === 'no') c.op = 'no'; else delete c.op; cambio(false); } },
+      h('option', { value: 'si', selected: c.op !== 'no' ? true : null }, 'sí'), h('option', { value: 'no', selected: c.op === 'no' ? true : null }, 'no')));
+  } else if (tipo === 'n') {
+    resto.push(h('select', { onchange: function (e) { c.op = e.target.value; cambio(false); } },
+      ['>', '>=', '<', '<=', 'es'].map(function (o) { return h('option', { value: o, selected: c.op === o ? true : null }, { '>': 'mayor que', '>=': 'al menos', '<': 'menor que', '<=': 'como mucho', es: 'igual a' }[o]); })));
+    resto.push(h('input', { type: 'number', value: c.v, style: 'width:90px', oninput: function (e) { c.v = Number(e.target.value); cambio(false); } }));
+  } else if (tipo === 'p') {
+    resto.push(h('select', { onchange: function (e) { c.op = e.target.value; cambio(false); } },
+      h('option', { value: 'es', selected: c.op === 'es' ? true : null }, 'es'), h('option', { value: 'no_es', selected: c.op === 'no_es' ? true : null }, 'no es')));
+    resto.push(h('select', { onchange: function (e) { c.v = e.target.value; cambio(false); } },
+      PLANES.map(function (p) { return h('option', { value: p, selected: c.v === p ? true : null }, p); })));
+  } else {
+    var id = listaDe(c.f), l = S.draft.listas[id], multi = !!CAMPOS[srv][id];
+    resto.push(h('select', { onchange: function (e) {
+      var nid = e.target.value; c.f = campoDe(nid); c.op = CAMPOS[srv][nid] ? 'incluye' : 'es'; c.v = S.draft.listas[nid].ops[0].es; cambio(true);
+    } }, enOrden(Object.keys(CAMPOS[srv])).map(function (x) { return h('option', { value: x, selected: x === id ? true : null }, S.draft.listas[x].nombre); })));
+    resto.push(h('select', { onchange: function (e) { c.op = e.target.value; cambio(false); } },
+      (multi ? [['incluye', 'incluye']] : [['es', 'es'], ['no_es', 'no es']]).map(function (o) { return h('option', { value: o[0], selected: c.op === o[0] ? true : null }, o[1]); })));
+    resto.push(h('select', { onchange: function (e) { c.v = e.target.value; cambio(false); } },
+      (l ? l.ops : []).map(function (o) { return h('option', { value: o.es, selected: c.v === o.es ? true : null }, o.es); }),
+      l && !l.ops.some(function (o) { return o.es === c.v; }) ? h('option', { value: c.v, selected: true }, '⚠ ' + c.v + ' (ya no existe)') : null));
+  }
+  return h('div', { class: 'cond cond-regla' }, que, h('div', { class: 'linea', style: 'gap:6px' }, resto), quitar);
+}
+
+// ................................................................ textos
+function pestanaTextos() {
+  var T = S.draft.textos, q = (S.filtroTextos || '').toLowerCase();
+  var grupos = {};
+  Object.keys(T).forEach(function (k) {
+    var t = T[k];
+    if (q && (t.es + ' ' + (t.en || '')).toLowerCase().indexOf(q) < 0) return;
+    (grupos[t.grupo || 'otros'] = grupos[t.grupo || 'otros'] || []).push(k);
+  });
+  Object.keys(grupos).forEach(function (g) { grupos[g].sort(function (a, b) { return (T[a].o || 0) - (T[b].o || 0); }); });
+  return h('div', null,
+    h('input', { type: 'text', placeholder: 'Buscar un texto…', value: S.filtroTextos || '', style: 'margin-bottom:14px',
+      oninput: function (e) { S.filtroTextos = e.target.value; var p = e.target.selectionStart; pintar(); var i = document.querySelector('input[placeholder="Buscar un texto…"]'); if (i) { i.focus(); i.setSelectionRange(p, p); } } }),
+    Object.keys(GRUPOS_TEXTO).concat(['otros']).filter(function (g) { return grupos[g]; }).map(function (g) {
+      return h('details', { class: 'textos-generales', open: q ? true : null },
+        h('summary', null, (GRUPOS_TEXTO[g] || 'Otros') + ' · ' + grupos[g].length),
+        grupos[g].map(function (k) { return h('div', { class: 'campo', style: 'margin-top:10px' }, par(T, k, { largo: T[k].es.length > 60 })); }));
+    }));
+}
+
+// ................................................................ ajustes
+function pestanaAjustes() {
+  var A = S.draft.ajustes = S.draft.ajustes || {};
+  if (S.draft.servicio === 'interior') {
+    return h('section', { class: 'textos-generales' },
+      h('h2', null, 'Ciudades con cobertura'),
+      h('p', { class: 'nota' }, 'Una por línea, en minúsculas y sin acentos. Fuera de ellas el proyecto va a llamada y se recomienda Borsoga Edition (según las reglas).'),
+      h('textarea', { rows: 14, value: (A.ciudades || []).join('\n'), oninput: function (e) {
+        A.ciudades = e.target.value.split('\n').map(function (x) { return x.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }).filter(Boolean);
+        cambio(false);
+      } }, (A.ciudades || []).join('\n')));
+  }
+  A.vistas = A.vistas || {};
+  var num = function (etq, obj, k) {
+    return h('label', { class: 'check' }, etq, h('input', { type: 'number', min: 1, max: 40, value: obj[k], style: 'width:80px',
+      oninput: function (e) { obj[k] = Math.max(1, parseInt(e.target.value, 10) || 1); cambio(false); } }));
+  };
+  return h('section', { class: 'textos-generales' },
+    h('h2', null, 'Vistas por escena'),
+    h('p', { class: 'nota' }, 'Cuántas vistas lleva cada escena según el plan con el que llega el cliente. Él puede ajustarlas a mano hasta el máximo.'),
+    h('div', { class: 'linea', style: 'margin-top:10px' }, PLANES.map(function (p) { return num(p, A.vistas, p); }),
+      num('Sin plan', A, 'vistasSinPlan'), num('Máximo', A, 'vistasMax')));
+}
+
+// ................................................................ diferencias
+function diferenciasConfig(a, b) {
+  var out = [];
+  Object.keys(b.listas).forEach(function (id) {
+    var la = a.listas[id], lb = b.listas[id];
+    if (!la) return out.push('Lista nueva: ' + lb.nombre);
+    if (igual(la, lb)) return;
+    var ea = la.ops.map(function (o) { return o.es; }), eb = lb.ops.map(function (o) { return o.es; });
+    var mas = eb.filter(function (x) { return ea.indexOf(x) < 0; }), menos = ea.filter(function (x) { return eb.indexOf(x) < 0; });
+    var c = [];
+    if (mas.length) c.push('opciones nuevas: ' + mas.join(', '));
+    if (menos.length) c.push('opciones quitadas: ' + menos.join(', '));
+    if (!mas.length && !menos.length) c.push(igual(ea, eb) ? 'traducciones o ajustes de opciones' : 'orden de opciones');
+    out.push(lb.nombre + ': ' + c.join('; '));
+  });
+  var R = function (x, k) { return JSON.stringify(x.reglas[k]); };
+  if (R(a, 'plan') !== R(b, 'plan') || a.reglas.planDefecto !== b.reglas.planDefecto) out.push('Reglas del plan recomendado');
+  if (R(a, 'ruta') !== R(b, 'ruta') || R(a, 'rutaDefecto') !== R(b, 'rutaDefecto') || R(a, 'titulos') !== R(b, 'titulos')) out.push('Reglas del tipo de respuesta');
+  if (R(a, 'avisos') !== R(b, 'avisos')) out.push('Avisos');
+  var nt = Object.keys(b.textos).filter(function (k) { return !igual(a.textos[k], b.textos[k]); }).length;
+  if (nt) out.push(nt + (nt === 1 ? ' texto cambiado' : ' textos cambiados'));
+  if (!igual(a.ajustes, b.ajustes)) out.push('Ajustes');
+  return out;
+}
+function sinInglesConfig(C) {
+  var n = 0;
+  Object.keys(C.listas).forEach(function (id) { C.listas[id].ops.forEach(function (o) { if (o.es && !o.en) n++; }); });
+  Object.keys(C.textos).forEach(function (k) { if (C.textos[k].es && !C.textos[k].en) n++; });
+  return n;
+}
+
 // ------------------------------------------------------------ vista previa
 // En otra pestaña, no en un iframe: el CDN de Hostinger manda
 // X-Frame-Options: SAMEORIGIN y borsogastudio.com no se deja incrustar aquí.
@@ -850,8 +1233,8 @@ function dialogoPublicar() {
       ]);
       return;
     }
-    var difs = diferencias(S.publicada.schema, S.draft);
-    var faltaEn = todas().filter(function (x) { return x.q.q.es && !x.q.q.en; }).length;
+    var difs = esConfig() ? diferenciasConfig(S.publicada.schema, S.draft) : diferencias(S.publicada.schema, S.draft);
+    var faltaEn = esConfig() ? sinInglesConfig(S.draft) : todas().filter(function (x) { return x.q.q.es && !x.q.q.en; }).length;
     var nota = h('textarea', { rows: 2, placeholder: 'Qué cambia y por qué (opcional, queda en el historial)' });
     var boton = h('button', { type: 'button', class: 'boton', onclick: function () {
       boton.disabled = true;
@@ -868,7 +1251,7 @@ function dialogoPublicar() {
       h('h2', null, 'Publicar la versión ' + (S.publicada.version + 1)),
       h('p', null, 'Estos cambios saldrán en la web en unos segundos:'),
       h('ul', { class: 'cambios-lista' }, difs.map(function (d) { return h('li', null, d); })),
-      faltaEn ? h('p', { class: 'candado' }, faltaEn + (faltaEn === 1 ? ' pregunta no tiene' : ' preguntas no tienen') + ' texto en inglés: en la página inglesa saldrán en español.') : null,
+      faltaEn ? h('p', { class: 'candado' }, faltaEn + (faltaEn === 1 ? ' pregunta no tiene' : (esConfig() ? ' textos u opciones no tienen' : ' preguntas no tienen')) + ' texto en inglés: en la página inglesa saldrán en español.') : null,
       h('div', { class: 'campo', style: 'margin-top:16px' }, h('label', null, 'Nota'), nota),
       h('div', { class: 'pie' }, h('button', { type: 'button', class: 'boton claro', onclick: m.cerrar }, 'Cancelar'), boton)
     ]);

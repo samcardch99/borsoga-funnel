@@ -175,7 +175,27 @@ export default async function handler(req: any, res: any) {
   // reglas que se aplican son siempre las del servidor.
   const service = ["av", "contacto", "web", "grafico"].includes(payload.service)
     ? payload.service : "interior";
-  const AV = service === "av" ? await import("./_av.js") : null;
+  // Los configuradores también se publican por versiones en el panel: con
+  // `version`, sus listas y reglas salen de ella (_configurador.ts); sin ella,
+  // de la lógica fija de siempre (aquí abajo para interiorismo, _av.ts para AV).
+  const ES_CONFIG = service === "interior" || service === "av";
+  const versionConfig = ES_CONFIG ? Math.floor(Number(payload.version)) || 0 : 0;
+  let CONFIG: import("./_configurador.js").Config | null = null;
+  if (versionConfig) {
+    try {
+      CONFIG = await (await import("./_forms.js")).version(service as "interior" | "av", versionConfig) as any;
+      if (!CONFIG) console.warn("submit: configuración", service, `versión ${versionConfig} desconocida`);
+    } catch (e: any) {
+      console.warn("submit: configuración", service, e?.message);
+    }
+  }
+  const MOTOR = CONFIG ? await import("./_configurador.js") : null;
+  const AV = service === "av"
+    ? (CONFIG ? MOTOR!.motorAv(CONFIG) : await import("./_av.js")) : null;
+  const INT = service === "av" || !CONFIG || !MOTOR
+    ? { validate, route, recommendPlan, unitTotal, unsureCount, structuralFlag, tamano: (i: number) => ["Compacto", "Estándar", "Amplio"][i] || "",
+        empresa: "Como empresa", representante: OWNER_REP }
+    : MOTOR.motorInterior(CONFIG);
   const ES_CONTACTO = service === "contacto";
   // Los dos cuestionarios largos comparten módulo: mismas reglas, otro juego de
   // preguntas. No calculan precio, así que no hay plan que recomendar.
@@ -195,7 +215,7 @@ export default async function handler(req: any, res: any) {
   let esquemaError: string | null = null;
   if (versionEsquema) {
     try {
-      ESQUEMA = await (await import("./_forms.js")).version(service as "web" | "grafico", versionEsquema);
+      ESQUEMA = await (await import("./_forms.js")).version(service as "web" | "grafico", versionEsquema) as any;
       if (!ESQUEMA) esquemaError = `versión ${versionEsquema} desconocida`;
     } catch (e: any) {
       esquemaError = e?.message || "no se pudo leer el esquema";
@@ -212,10 +232,10 @@ export default async function handler(req: any, res: any) {
     ? (versionEsquema
         ? validarRespuestas!(ESQUEMA || ({ pasos: [] } as any), a, uploads)
         : BRIEF.validate(a, service, uploads))
-    : ES_CONTACTO ? validarContacto(a) : (AV ? AV.validate(a) : validate(a));
+    : ES_CONTACTO ? validarContacto(a) : (AV ? AV.validate(a) : INT.validate(a));
   // Al bot le devolvemos ok: si le decimos que lo pillamos, prueba otra cosa.
   if (bad === "bot") {
-    return json({ ok: true, route: BRIEF ? BRIEF.route(service) : AV ? AV.route(a, "") : route(a, "") });
+    return json({ ok: true, route: BRIEF ? BRIEF.route(service) : AV ? AV.route(a, "") : INT.route(a, "") });
   }
   if (bad) return json({ ok: false, error: bad }, 422);
 
@@ -224,11 +244,11 @@ export default async function handler(req: any, res: any) {
   const rt: [string, string, string] = ES_CONTACTO
     ? ["call", "Recibimos tu mensaje", "Te escribimos en persona para hablar del proyecto."]
     : BRIEF ? BRIEF.route(service)
-    : (AV ? AV.route(a, picked) : route(a, picked));
+    : (AV ? AV.route(a, picked) : INT.route(a, picked));
   // En los cuestionarios el plan no se calcula: es la tarjeta desde la que
   // llegó el lead, si es que llegó desde una.
   const plan = (ES_CONTACTO || BRIEF) ? (picked || "—")
-    : (picked || (AV ? AV.recommendPlan(a) : recommendPlan(a)));
+    : (picked || (AV ? AV.recommendPlan(a) : INT.recommendPlan(a)));
   // Si el cliente calculó otra ruta, lo anotamos: o hay un bug, o alguien tocó.
   const mismatch = !ES_CONTACTO && !BRIEF && clientDerived?.route && clientDerived.route !== rt[0]
     ? `cliente=${clientDerived.route} servidor=${rt[0]}` : null;
@@ -283,10 +303,10 @@ export default async function handler(req: any, res: any) {
          unsure, structural, mismatch, answers, derived, files)
         values (${service}, ${a.name}, ${a.email}, ${a.phone}, ${a.city},
                 ${AV ? a.country : (a.state || null)}, ${plan}, ${rt[0]},
-                ${(ES_CONTACTO || BRIEF) ? 0 : (AV ? AV.sceneTotal(a) : unitTotal(a))},
+                ${(ES_CONTACTO || BRIEF) ? 0 : (AV ? AV.sceneTotal(a) : INT.unitTotal(a))},
                 ${(ES_CONTACTO || BRIEF) ? null : (AV ? AV.imageTotal(a, picked) : (clientDerived?.imageTotal ?? null))},
-                ${(ES_CONTACTO || BRIEF) ? 0 : unsureCount(a)},
-                ${(AV || ES_CONTACTO || BRIEF) ? false : structuralFlag(a)}, ${mismatch},
+                ${(ES_CONTACTO || BRIEF) ? 0 : (AV ? unsureCount(a) : INT.unsureCount(a))},
+                ${(AV || ES_CONTACTO || BRIEF) ? false : INT.structuralFlag(a)}, ${mismatch},
                 ${JSON.stringify(a)}, ${JSON.stringify(clientDerived || {})},
                 ${JSON.stringify(files)})
         returning id`;
@@ -322,7 +342,13 @@ export default async function handler(req: any, res: any) {
   // El lead entra en Twenty como persona + oportunidad + nota. Si falla, el
   // lead ya está guardado y el correo sale igual: nunca tumba el envío.
   const { pushToTwenty } = await import("./_twenty.js");
-  const crm = await pushToTwenty(a, clientDerived, plan, rt, files, service,
+  // La nota de interiorismo lee el tamaño, la firma y el dueño por su papel en
+  // la configuración, no por el texto: se lo damos resuelto.
+  const derivedNota = service === "interior"
+    ? { ...clientDerived, tamanoNombre: a.size >= 0 ? INT.tamano(a.size) : "",
+        esEmpresa: a.signer === INT.empresa, esRepresentante: a.isOwner === INT.representante }
+    : clientDerived;
+  const crm = await pushToTwenty(a, derivedNota, plan, rt, files, service,
                                  BRIEF ? BRIEF.noteBody(a, service, plan, rt, files, ESQUEMA,
                                                         esquemaError ? `v${versionEsquema}: ${esquemaError}` : null)
                                        : AV ? AV.noteBody(a, picked, rt, files) : null,
@@ -358,7 +384,7 @@ export default async function handler(req: any, res: any) {
     const line = (k: string, v: any) => (v ? `<tr><td style="padding:4px 14px 4px 0;color:#666">${k}</td><td>${String(v)}</td></tr>` : "");
     const body = `<div style="font-family:system-ui,sans-serif;font-size:14px;line-height:1.5">
 <h2 style="margin:0 0 4px">${rt[1]} · ${plan}</h2>
-<p style="margin:0 0 16px;color:#666">Servicio: <strong>${service}</strong>${versionEsquema ? ` · Cuestionario v${versionEsquema}${esquemaError ? ` (⚠ ${esquemaError})` : ""}` : ""} · Ruta: <strong>${rt[0]}</strong>${(BRIEF ? BRIEF.flags(a, service) : AV ? AV.flags(a) : []).map((f: string) => `<br>⚠ ${f}`).join("")}${mismatch ? ` · ⚠ discrepancia: ${mismatch}` : ""}${(!BRIEF && !ES_CONTACTO && structuralFlag(a)) ? " · ⚠ obra estructural" : ""}</p>
+<p style="margin:0 0 16px;color:#666">Servicio: <strong>${service}</strong>${versionEsquema ? ` · Cuestionario v${versionEsquema}${esquemaError ? ` (⚠ ${esquemaError})` : ""}` : ""} · Ruta: <strong>${rt[0]}</strong>${(BRIEF ? BRIEF.flags(a, service) : AV ? AV.flags(a) : []).map((f: string) => `<br>⚠ ${f}`).join("")}${mismatch ? ` · ⚠ discrepancia: ${mismatch}` : ""}${(!BRIEF && !ES_CONTACTO && !AV && INT.structuralFlag(a)) ? " · ⚠ obra estructural" : ""}${versionConfig ? ` · Configurador v${versionConfig}${CONFIG ? "" : " (⚠ no se pudo leer: reglas de siempre)"}` : ""}</p>
 <table style="border-collapse:collapse">
 ${line("Nombre", a.name)}${line("Correo", a.email)}${line("Teléfono", a.phone)}
 ${BRIEF ? `
@@ -374,7 +400,7 @@ ${line("Proyecto", [a.projectType, a.workType].filter(Boolean).join(" · "))}
 ${line(AV ? "Escenas" : "Espacios", AV ? AV.sceneSummary(a) : clientDerived?.spaceSummary)}${line("Imágenes", AV ? AV.imageTotal(a, picked) : clientDerived?.imageTotal)}
 ${line(AV ? "Tono" : "Acabado", AV ? a.tone : a.finish)}${line("Presupuesto", a.budget)}${line("Cuándo", a.timing)}
 ${line("Quién decide", a.decider)}${line("Extras", (a.extras || []).join(", "))}
-${line("Sin definir", unsureCount(a))}`}
+${line("Sin definir", AV ? unsureCount(a) : INT.unsureCount(a))}`}
 ${line("Archivos", files.length)}
 ${line("Lead", leadId)}${line("CRM", crm.opportunityId ? "oportunidad creada" : `⚠ ${crm.error}`)}
 </table>

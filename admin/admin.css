@@ -178,3 +178,12 @@ input:focus, select:focus, textarea:focus { outline: 2px solid #111; outline-off
 
 .aviso { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); background: var(--tinta); color: #fff; padding: 10px 18px; border-radius: 999px; font-size: 14px; z-index: 60; max-width: calc(100vw - 32px); }
 .aviso.mal { background: var(--mal); }
+
+/* configuradores */
+.pestanas { display: flex; gap: 4px; border-bottom: 1px solid var(--linea); margin-bottom: 18px; overflow-x: auto; }
+.pestanas button { border: 0; background: transparent; padding: 10px 16px; cursor: pointer; font-size: 15px; color: var(--suave); border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+.pestanas button[aria-selected=true] { color: var(--tinta); border-bottom-color: var(--tinta); font-weight: 600; }
+.textos-generales h2 { margin-bottom: 4px; }
+.regla { background: #faf9f6; border: 1px solid var(--linea); border-radius: 10px; padding: 12px; display: grid; gap: 8px; }
+.cond-regla { grid-template-columns: minmax(0, 1.3fr) minmax(0, 2fr) auto; }
+.cond-regla select, .cond-regla input { width: auto; max-width: 100%; }

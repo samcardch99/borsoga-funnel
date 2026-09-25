@@ -182,7 +182,10 @@ que aplicarlo en los dos sitios: ya nos mordió una vez con el texto de la ruta.
 
 ## Panel de administración (admin.borsogastudio.com)
 
-Edita los cuestionarios de diseño web e identidad de marca y los publica.
+Edita y publica los cuestionarios de diseño web e identidad de marca (formato 1:
+pasos y preguntas) y los configuradores de interiorismo y AV (formato 2: listas de
+opciones con papel, grupo y marcas, reglas de plan y de respuesta, textos y
+ajustes; el código de la web busca las opciones por su papel, nunca por el texto).
 
 - **Interfaz:** `admin/` (HTML + JS sin dependencias), servida en `/admin/`; el
   host `admin.borsogastudio.com` redirige `/` a `/admin/` (vercel.json; una reescritura no vale: el `index.html` estático de la raíz gana).
@@ -195,8 +198,10 @@ Edita los cuestionarios de diseño web e identidad de marca y los publica.
   sale en la web al momento, sin recompilar. La compilación también lo lee y deja
   una copia de reserva dentro de la página por si la API no responde.
 - **Validación:** cada envío trae `version`; `submit.ts` valida contra esa
-  versión (`_esquema.ts`). Sin `version` (páginas anteriores al panel) siguen
-  valiendo las reglas de `_brief.ts`.
+  versión (`_esquema.ts` para los cuestionarios, `_configurador.ts` para los
+  configuradores, que además calcula plan y ruta con las reglas publicadas). Sin
+  `version` (páginas anteriores al panel) sigue valiendo la lógica fija de
+  `_brief.ts`, `submit.ts` y `_av.ts`.
 - **Opciones fijas:** las que compara el servidor (`_brief.ts`: REGLAS, flags)
   van marcadas `fija` en el esquema; el panel no deja quitarlas ni renombrarlas.
 

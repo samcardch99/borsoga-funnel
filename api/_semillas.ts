@@ -1,9 +1,10 @@
-// Los dos cuestionarios tal como salieron del código (borsoga-studio,
+// Los formularios editables tal como salieron del código (borsoga-studio,
 // src/plans/forms/*.json). Solo se usan una vez: la primera vez que se piden y
 // la base de datos no tiene ninguna versión, se guardan como versión 1.
 import type { Esquema } from "./_esquema.js";
+import type { Config } from "./_configurador.js";
 
-export const SEMILLAS: Record<string, Esquema> = {
+export const SEMILLAS: Record<string, Esquema | Config> = {
   web: {
   "formato": 1,
   "servicio": "web",
@@ -3458,4 +3459,3697 @@ export const SEMILLAS: Record<string, Esquema> = {
     }
   ]
 } as Esquema,
+  interior: {
+  "formato": 2,
+  "servicio": "interior",
+  "clave": "borsoga.cuestionario.interior.v4",
+  "listas": {
+    "projectType": {
+      "nombre": "¿Para qué es el proyecto?",
+      "ops": [
+        {
+          "es": "Para vivir yo",
+          "en": "To live in myself",
+          "rol": "vivir"
+        },
+        {
+          "es": "Para vender o rentar",
+          "en": "To sell or rent",
+          "rol": "invertir"
+        },
+        {
+          "es": "Es un espacio comercial",
+          "en": "It's a commercial space",
+          "rol": "comercial"
+        }
+      ]
+    },
+    "dealType": {
+      "nombre": "¿Vender o rentar?",
+      "ops": [
+        {
+          "es": "Para vender",
+          "en": "To sell"
+        },
+        {
+          "es": "Para rentar",
+          "en": "To rent"
+        }
+      ]
+    },
+    "ownership": {
+      "nombre": "¿Ya es tuya?",
+      "ops": [
+        {
+          "es": "Sí, ya es mía",
+          "en": "Yes, it's mine"
+        },
+        {
+          "es": "Estoy en proceso de compra",
+          "en": "I'm in the process of buying",
+          "rol": "en_compra"
+        }
+      ]
+    },
+    "commercialType": {
+      "nombre": "Tipo de espacio comercial",
+      "ops": [
+        {
+          "es": "Oficina",
+          "en": "Office"
+        },
+        {
+          "es": "Retail",
+          "en": "Retail"
+        },
+        {
+          "es": "Showroom",
+          "en": "Showroom"
+        },
+        {
+          "es": "Restaurante o bar",
+          "en": "Restaurant or bar",
+          "rol": "salud"
+        },
+        {
+          "es": "Hospitalidad",
+          "en": "Hospitality"
+        },
+        {
+          "es": "Amenidades de edificio",
+          "en": "Building amenities"
+        },
+        {
+          "es": "Modelo de ventas",
+          "en": "Sales gallery"
+        },
+        {
+          "es": "Otro",
+          "en": "Other",
+          "rol": "otro"
+        }
+      ]
+    },
+    "occupancy": {
+      "nombre": "¿Vacío o en operación?",
+      "ops": [
+        {
+          "es": "Vacío o en obra",
+          "en": "Empty or under construction"
+        },
+        {
+          "es": "En operación",
+          "en": "Operating"
+        },
+        {
+          "es": "Todavía no lo tengo",
+          "en": "I don't have it yet",
+          "rol": "sin_local"
+        }
+      ]
+    },
+    "propertyType": {
+      "nombre": "Tipo de propiedad",
+      "ops": [
+        {
+          "es": "Condominio",
+          "en": "Condo",
+          "rol": "condo"
+        },
+        {
+          "es": "Casa",
+          "en": "House",
+          "rol": "casa"
+        },
+        {
+          "es": "Penthouse",
+          "en": "Penthouse",
+          "rol": "condo"
+        }
+      ]
+    },
+    "workType": {
+      "nombre": "¿Obra nueva o remodelación?",
+      "ops": [
+        {
+          "es": "Obra nueva",
+          "en": "New construction",
+          "rol": "nueva"
+        },
+        {
+          "es": "Remodelación",
+          "en": "Remodel",
+          "rol": "remodelacion"
+        }
+      ]
+    },
+    "stage": {
+      "nombre": "Etapa de la obra",
+      "ops": [
+        {
+          "es": "Todavía en planos",
+          "en": "Still in drawings"
+        },
+        {
+          "es": "En construcción",
+          "en": "Under construction"
+        },
+        {
+          "es": "Terminada sin entregar",
+          "en": "Finished, not handed over"
+        }
+      ]
+    },
+    "year": {
+      "nombre": "Año de la propiedad",
+      "ops": [
+        {
+          "es": "Antes de 1990",
+          "en": "Before 1990"
+        },
+        {
+          "es": "1990 a 2010",
+          "en": "1990 to 2010"
+        },
+        {
+          "es": "Después de 2010",
+          "en": "After 2010"
+        },
+        {
+          "es": "No sé",
+          "en": "I don't know",
+          "duda": true
+        }
+      ]
+    },
+    "structure": {
+      "nombre": "Paredes y fachada",
+      "ops": [
+        {
+          "es": "Se mueven o se quitan paredes",
+          "en": "Walls being moved or removed",
+          "rol": "estructural"
+        },
+        {
+          "es": "Cambios en la fachada del edificio o la casa",
+          "en": "Changes to the facade",
+          "rol": "estructural"
+        },
+        {
+          "es": "Ninguno de los dos",
+          "en": "Neither of those",
+          "rol": "exclusiva"
+        },
+        {
+          "es": "No lo sé todavía",
+          "en": "I don't know yet",
+          "duda": true,
+          "rol": "exclusiva"
+        }
+      ]
+    },
+    "espacios": {
+      "nombre": "Espacios",
+      "ops": [
+        {
+          "es": "Cocina",
+          "en": "Kitchen",
+          "grupo": "residencial",
+          "marcas": {
+            "humedo": true,
+            "cocina": true
+          },
+          "plural": {
+            "es": "cocinas",
+            "en": "kitchens"
+          }
+        },
+        {
+          "es": "Baño",
+          "en": "Bathroom",
+          "grupo": "residencial",
+          "marcas": {
+            "humedo": true
+          },
+          "plural": {
+            "es": "baños",
+            "en": "bathrooms"
+          }
+        },
+        {
+          "es": "Dormitorio",
+          "en": "Bedroom",
+          "grupo": "residencial",
+          "plural": {
+            "es": "dormitorios",
+            "en": "bedrooms"
+          }
+        },
+        {
+          "es": "Sala",
+          "en": "Living room",
+          "grupo": "residencial",
+          "plural": {
+            "es": "salas",
+            "en": "living rooms"
+          }
+        },
+        {
+          "es": "Comedor",
+          "en": "Dining room",
+          "grupo": "residencial",
+          "plural": {
+            "es": "comedores",
+            "en": "dining rooms"
+          }
+        },
+        {
+          "es": "Home office",
+          "en": "Home office",
+          "grupo": "residencial",
+          "plural": {
+            "es": "home offices",
+            "en": "home offices"
+          }
+        },
+        {
+          "es": "Clóset",
+          "en": "Closet",
+          "grupo": "residencial",
+          "plural": {
+            "es": "clósets",
+            "en": "closets"
+          }
+        },
+        {
+          "es": "Lavandería",
+          "en": "Laundry",
+          "grupo": "residencial",
+          "marcas": {
+            "humedo": true,
+            "cocina": true,
+            "lavanderia": true
+          },
+          "plural": {
+            "es": "lavanderías",
+            "en": "laundries"
+          }
+        },
+        {
+          "es": "Entrada",
+          "en": "Entry",
+          "grupo": "residencial",
+          "plural": {
+            "es": "entradas",
+            "en": "entries"
+          }
+        },
+        {
+          "es": "Patio o jardín",
+          "en": "Patio or yard",
+          "grupo": "casa",
+          "marcas": {
+            "exterior": true
+          },
+          "plural": {
+            "es": "patios o jardines",
+            "en": "patios"
+          }
+        },
+        {
+          "es": "Garaje",
+          "en": "Garage",
+          "grupo": "casa",
+          "plural": {
+            "es": "garajes",
+            "en": "garages"
+          }
+        },
+        {
+          "es": "Área de piscina",
+          "en": "Pool area",
+          "grupo": "casa",
+          "marcas": {
+            "piscina": true
+          },
+          "plural": {
+            "es": "áreas de piscina",
+            "en": "pool areas"
+          }
+        },
+        {
+          "es": "Balcón o terraza",
+          "en": "Balcony or terrace",
+          "grupo": "condo",
+          "marcas": {
+            "exterior": true
+          },
+          "plural": {
+            "es": "balcones o terrazas",
+            "en": "balconies"
+          }
+        },
+        {
+          "es": "Recepción o lobby",
+          "en": "Reception or lobby",
+          "grupo": "comercial",
+          "plural": {
+            "es": "recepciones o lobbies",
+            "en": "lobbies"
+          }
+        },
+        {
+          "es": "Área de trabajo",
+          "en": "Work area",
+          "grupo": "comercial",
+          "plural": {
+            "es": "áreas de trabajo",
+            "en": "work areas"
+          }
+        },
+        {
+          "es": "Sala de juntas",
+          "en": "Meeting room",
+          "grupo": "comercial",
+          "plural": {
+            "es": "salas de juntas",
+            "en": "meeting rooms"
+          }
+        },
+        {
+          "es": "Área de clientes",
+          "en": "Customer area",
+          "grupo": "comercial",
+          "plural": {
+            "es": "áreas de clientes",
+            "en": "customer areas"
+          }
+        },
+        {
+          "es": "Comedor o cocina de staff",
+          "en": "Staff kitchen or dining",
+          "grupo": "comercial",
+          "marcas": {
+            "humedo": true,
+            "cocina": true
+          },
+          "plural": {
+            "es": "comedores o cocinas de staff",
+            "en": "staff kitchens"
+          }
+        },
+        {
+          "es": "Baños",
+          "en": "Restrooms",
+          "grupo": "comercial",
+          "marcas": {
+            "humedo": true
+          },
+          "plural": {
+            "es": "baños",
+            "en": "bathrooms"
+          }
+        },
+        {
+          "es": "Salón o comedor",
+          "en": "Dining room",
+          "grupo": "comercial",
+          "plural": {
+            "es": "salones o comedores",
+            "en": "dining rooms"
+          }
+        },
+        {
+          "es": "Barra",
+          "en": "Bar",
+          "grupo": "comercial",
+          "marcas": {
+            "humedo": true,
+            "barra": true
+          },
+          "plural": {
+            "es": "barras",
+            "en": "bars"
+          }
+        },
+        {
+          "es": "Vitrina y fachada interior",
+          "en": "Window and interior facade",
+          "grupo": "comercial",
+          "plural": {
+            "es": "vitrinas y fachadas interiores",
+            "en": "windows"
+          }
+        }
+      ]
+    },
+    "millwork": {
+      "nombre": "Muebles a la medida: opciones además de los espacios",
+      "ops": [
+        {
+          "es": "En ninguno, compramos todo hecho",
+          "en": "None, we're buying everything ready-made",
+          "rol": "exclusiva"
+        },
+        {
+          "es": "Todavía no lo sé",
+          "en": "I don't know yet",
+          "duda": true,
+          "rol": "exclusiva"
+        }
+      ]
+    },
+    "keepFurniture": {
+      "nombre": "¿Conserva muebles?",
+      "ops": [
+        {
+          "es": "Sí, en algunos espacios",
+          "en": "Yes, in some spaces",
+          "rol": "elige_espacios"
+        },
+        {
+          "es": "No, empezamos de cero",
+          "en": "No, we're starting fresh"
+        },
+        {
+          "es": "Todavía no lo sé",
+          "en": "I don't know yet",
+          "duda": true
+        }
+      ]
+    },
+    "pieces": {
+      "nombre": "¿Piezas decididas?",
+      "ops": [
+        {
+          "es": "Sí, tengo piezas decididas",
+          "en": "Yes, I have pieces decided",
+          "rol": "enlace"
+        },
+        {
+          "es": "Tengo referencias, pero nada decidido",
+          "en": "I have references, but nothing decided",
+          "rol": "enlace"
+        },
+        {
+          "es": "No, todavía no",
+          "en": "Not yet"
+        },
+        {
+          "es": "Quiero que ustedes las propongan",
+          "en": "I'd like you to propose them"
+        }
+      ]
+    },
+    "tamano": {
+      "nombre": "Tamaño del proyecto",
+      "ops": [
+        {
+          "es": "Compacto",
+          "en": "Compact",
+          "desc": {
+            "es": "Espacios chicos, sin grandes cambios de distribución",
+            "en": "Small spaces, no major layout changes"
+          },
+          "n": 3
+        },
+        {
+          "es": "Estándar",
+          "en": "Standard",
+          "desc": {
+            "es": "El tamaño típico de un apartamento o una casa",
+            "en": "The typical size of an apartment or a house"
+          },
+          "n": 5
+        },
+        {
+          "es": "Amplio",
+          "en": "Spacious",
+          "desc": {
+            "es": "Espacios grandes, áreas abiertas o dobles alturas",
+            "en": "Large spaces, open areas or double heights"
+          },
+          "n": 8
+        }
+      ]
+    },
+    "budget": {
+      "nombre": "Presupuesto",
+      "ops": [
+        {
+          "es": "Menos de $25,000",
+          "en": "Under $25,000"
+        },
+        {
+          "es": "$25,000 a $75,000",
+          "en": "$25,000 to $75,000"
+        },
+        {
+          "es": "$75,000 a $150,000",
+          "en": "$75,000 to $150,000"
+        },
+        {
+          "es": "$150,000 a $400,000",
+          "en": "$150,000 to $400,000"
+        },
+        {
+          "es": "Más de $400,000",
+          "en": "Over $400,000"
+        },
+        {
+          "es": "Todavía no lo tengo definido",
+          "en": "I haven't decided yet"
+        }
+      ]
+    },
+    "plumbing": {
+      "nombre": "¿Se mueve el agua o el desagüe?",
+      "ops": [
+        {
+          "es": "Sí",
+          "en": "Yes"
+        },
+        {
+          "es": "No",
+          "en": "No"
+        },
+        {
+          "es": "No sé",
+          "en": "I don't know",
+          "duda": true
+        }
+      ]
+    },
+    "appliances": {
+      "nombre": "¿Electrodomésticos elegidos?",
+      "ops": [
+        {
+          "es": "Sí, ya sé cuáles van",
+          "en": "Yes, I know which ones",
+          "rol": "decidido"
+        },
+        {
+          "es": "Todavía no",
+          "en": "Not yet"
+        },
+        {
+          "es": "Quiero que ustedes me ayuden a elegirlos",
+          "en": "I'd like you to help me choose",
+          "rol": "ayuda"
+        }
+      ]
+    },
+    "laundry": {
+      "nombre": "¿Lavadora y secadora elegidas?",
+      "ops": [
+        {
+          "es": "Sí, ya sé cuáles van",
+          "en": "Yes, I know which ones",
+          "rol": "decidido"
+        },
+        {
+          "es": "Todavía no",
+          "en": "Not yet"
+        },
+        {
+          "es": "Quiero que ustedes me ayuden a elegirlos",
+          "en": "I'd like you to help me choose",
+          "rol": "ayuda"
+        }
+      ]
+    },
+    "laundryLayout": {
+      "nombre": "Cómo van la lavadora y la secadora",
+      "ops": [
+        {
+          "es": "Apiladas",
+          "en": "Stacked"
+        },
+        {
+          "es": "Lado a lado",
+          "en": "Side by side"
+        },
+        {
+          "es": "No lo sé",
+          "en": "I don't know",
+          "duda": true
+        }
+      ]
+    },
+    "barEquip": {
+      "nombre": "¿Equipo de barra elegido?",
+      "ops": [
+        {
+          "es": "Sí, ya sé cuáles van",
+          "en": "Yes, I know which ones",
+          "rol": "decidido"
+        },
+        {
+          "es": "Todavía no",
+          "en": "Not yet"
+        },
+        {
+          "es": "Quiero que ustedes me ayuden a elegirlos",
+          "en": "I'd like you to help me choose",
+          "rol": "ayuda"
+        }
+      ]
+    },
+    "pool": {
+      "nombre": "¿Incluye la piscina?",
+      "ops": [
+        {
+          "es": "Sí",
+          "en": "Yes"
+        },
+        {
+          "es": "No",
+          "en": "No"
+        },
+        {
+          "es": "No hay piscina",
+          "en": "There's no pool"
+        }
+      ]
+    },
+    "hoa": {
+      "nombre": "¿HOA o asociación?",
+      "ops": [
+        {
+          "es": "Sí",
+          "en": "Yes"
+        },
+        {
+          "es": "No",
+          "en": "No"
+        },
+        {
+          "es": "No sé",
+          "en": "I don't know",
+          "duda": true
+        }
+      ]
+    },
+    "health": {
+      "nombre": "¿Departamento de salud?",
+      "ops": [
+        {
+          "es": "Sí",
+          "en": "Yes"
+        },
+        {
+          "es": "No",
+          "en": "No"
+        },
+        {
+          "es": "No sé",
+          "en": "I don't know",
+          "duda": true
+        }
+      ]
+    },
+    "finish": {
+      "nombre": "Nivel de acabado",
+      "ops": [
+        {
+          "es": "Estándar",
+          "en": "Standard",
+          "etiqueta": {
+            "es": "Nivel 01",
+            "en": "Level 01"
+          }
+        },
+        {
+          "es": "Alta gama",
+          "en": "High-end",
+          "etiqueta": {
+            "es": "Nivel 02",
+            "en": "Level 02"
+          }
+        },
+        {
+          "es": "Lujo",
+          "en": "Luxury",
+          "etiqueta": {
+            "es": "Nivel 03",
+            "en": "Level 03"
+          }
+        }
+      ]
+    },
+    "clarity": {
+      "nombre": "¿Qué tan claro lo tiene?",
+      "ops": [
+        {
+          "es": "Ya tengo referencias y decisiones tomadas",
+          "en": "I have references and decisions made"
+        },
+        {
+          "es": "Tengo una idea general",
+          "en": "I have a general idea"
+        },
+        {
+          "es": "Cuento con ustedes para definirlo",
+          "en": "I'm counting on you to define it"
+        }
+      ]
+    },
+    "extras": {
+      "nombre": "Extras",
+      "ops": [
+        {
+          "es": "Borsoga Immersive",
+          "en": "Borsoga Immersive",
+          "desc": {
+            "es": "Caminas tu espacio con lentes de realidad virtual. Vamos a donde estés.",
+            "en": "Walk your space before it exists. We come to you with the headset."
+          }
+        },
+        {
+          "es": "Tour 360",
+          "en": "Tour 360",
+          "desc": {
+            "es": "Un recorrido navegable de tu proyecto. Se abre en cualquier navegador.",
+            "en": "Your project, walkable from any screen. Opens in any browser."
+          }
+        },
+        {
+          "es": "Imágenes adicionales",
+          "en": "Additional images",
+          "desc": {
+            "es": "Más vistas de tu proyecto, además de las que ya trae tu plan.",
+            "en": "More views than the ones your project includes."
+          }
+        }
+      ]
+    },
+    "showcase": {
+      "nombre": "Algo más al terminar",
+      "ops": [
+        {
+          "es": "Imágenes para el listing",
+          "en": "Images for the listing",
+          "grupo": "invertir"
+        },
+        {
+          "es": "Tour 360 para tus compradores",
+          "en": "A 360 tour for your buyers",
+          "grupo": "invertir"
+        },
+        {
+          "es": "Brochure o material impreso",
+          "en": "A brochure or printed material",
+          "grupo": "invertir"
+        },
+        {
+          "es": "Una página del proyecto",
+          "en": "A page for the project",
+          "grupo": "invertir"
+        },
+        {
+          "es": "Imágenes para redes y publicidad",
+          "en": "Images for social and advertising",
+          "grupo": "comercial"
+        },
+        {
+          "es": "Tour 360 del local",
+          "en": "A 360 tour of the space",
+          "grupo": "comercial"
+        },
+        {
+          "es": "Identidad o rótulos del negocio",
+          "en": "Branding or signage for the business",
+          "grupo": "comercial"
+        },
+        {
+          "es": "Una página del negocio",
+          "en": "A page for the business",
+          "grupo": "comercial"
+        },
+        {
+          "es": "Fotos profesionales del terminado",
+          "en": "Professional photos when it's done",
+          "grupo": "vivir"
+        },
+        {
+          "es": "Video del proyecto",
+          "en": "A video of the project",
+          "grupo": "vivir"
+        },
+        {
+          "es": "No, por ahora no",
+          "en": "Not for now",
+          "rol": "ninguno"
+        }
+      ]
+    },
+    "signer": {
+      "nombre": "¿Firma personal o empresa?",
+      "ops": [
+        {
+          "es": "A título personal",
+          "en": "Personally",
+          "rol": "personal"
+        },
+        {
+          "es": "Como empresa",
+          "en": "As a company",
+          "rol": "empresa"
+        }
+      ]
+    },
+    "isOwner": {
+      "nombre": "¿Es el dueño?",
+      "ops": [
+        {
+          "es": "Sí",
+          "en": "Yes"
+        },
+        {
+          "es": "No, soy el representante autorizado",
+          "en": "No, I'm the authorized representative",
+          "rol": "representante"
+        }
+      ]
+    },
+    "decider": {
+      "nombre": "¿Quién decide?",
+      "ops": [
+        {
+          "es": "Yo solo",
+          "en": "Just me"
+        },
+        {
+          "es": "Mi pareja y yo",
+          "en": "My partner and I"
+        },
+        {
+          "es": "Un grupo o un comité",
+          "en": "A group or a committee"
+        }
+      ]
+    },
+    "timing": {
+      "nombre": "¿Cuándo empezar?",
+      "ops": [
+        {
+          "es": "Lo antes posible",
+          "en": "As soon as possible"
+        },
+        {
+          "es": "En 1 a 3 meses",
+          "en": "In 1 to 3 months"
+        },
+        {
+          "es": "Estoy explorando",
+          "en": "I'm just exploring",
+          "rol": "explorando"
+        }
+      ]
+    },
+    "deadline": {
+      "nombre": "¿Fecha límite?",
+      "ops": [
+        {
+          "es": "No, sin fecha fija",
+          "en": "No fixed date"
+        },
+        {
+          "es": "Sí, pero es flexible",
+          "en": "Yes, but it's flexible"
+        },
+        {
+          "es": "Sí, y es fija",
+          "en": "Yes, and it's fixed",
+          "rol": "fija"
+        }
+      ]
+    },
+    "pro": {
+      "nombre": "¿Contratista o arquitecto?",
+      "ops": [
+        {
+          "es": "Sí",
+          "en": "Yes"
+        },
+        {
+          "es": "No",
+          "en": "No"
+        },
+        {
+          "es": "Me gustaría que me recomienden uno",
+          "en": "I'd like you to recommend one",
+          "rol": "recomendar"
+        },
+        {
+          "es": "No lo he decidido",
+          "en": "I haven't decided"
+        }
+      ]
+    },
+    "portfolio": {
+      "nombre": "¿Publicar el proyecto?",
+      "ops": [
+        {
+          "es": "Sí, sin problema",
+          "en": "Yes, no problem"
+        },
+        {
+          "es": "Sí, pero sin decir dónde está",
+          "en": "Yes, but don't say where it is"
+        },
+        {
+          "es": "Prefiero que no",
+          "en": "I'd rather not"
+        }
+      ]
+    }
+  },
+  "reglas": {
+    "planDefecto": "Essential",
+    "plan": [
+      {
+        "plan": "Borsoga Edition",
+        "si": [
+          {
+            "s": "fuera_zona"
+          }
+        ]
+      },
+      {
+        "plan": "Borsoga Edition",
+        "si": [
+          {
+            "s": "campo",
+            "f": "finish",
+            "op": "es",
+            "v": "Lujo"
+          }
+        ]
+      },
+      {
+        "plan": "Borsoga Edition",
+        "si": [
+          {
+            "s": "es_casa"
+          },
+          {
+            "s": "espacios",
+            "op": ">",
+            "v": 4
+          }
+        ]
+      },
+      {
+        "plan": "Borsoga Edition",
+        "si": [
+          {
+            "s": "extras",
+            "op": ">=",
+            "v": 2
+          }
+        ]
+      },
+      {
+        "plan": "Premium",
+        "si": [
+          {
+            "s": "necesita_planos"
+          }
+        ]
+      },
+      {
+        "plan": "Premium",
+        "si": [
+          {
+            "s": "obra_nueva"
+          }
+        ]
+      },
+      {
+        "plan": "Premium",
+        "si": [
+          {
+            "s": "estructural"
+          }
+        ]
+      },
+      {
+        "plan": "Premium",
+        "si": [
+          {
+            "s": "campo",
+            "f": "plumbing",
+            "op": "es",
+            "v": "Sí"
+          }
+        ]
+      }
+    ],
+    "ruta": [
+      {
+        "tipo": "call",
+        "si": [
+          {
+            "s": "plan_elegido",
+            "op": "es",
+            "v": "Borsoga Edition"
+          }
+        ],
+        "texto": {
+          "es": "Borsoga Edition se cotiza en una llamada. Tenemos todo lo que nos contaste, así que la conversación empieza donde la dejaste.",
+          "en": "Borsoga Edition is quoted on a call. We have everything you told us, so the conversation starts where you left it."
+        }
+      },
+      {
+        "tipo": "call",
+        "si": [
+          {
+            "s": "fuera_florida"
+          }
+        ],
+        "texto": {
+          "es": "La dirección del proyecto está fuera de Florida. Eso lo revisamos contigo antes de hablar de precio.",
+          "en": "The project address is outside Florida. We go over that with you before talking price."
+        }
+      },
+      {
+        "tipo": "call",
+        "si": [
+          {
+            "s": "fuera_zona"
+          }
+        ],
+        "texto": {
+          "es": "Tu proyecto está fuera de Miami-Dade. Podemos hacerlo, pero el alcance y el desplazamiento los cerramos hablando.",
+          "en": "Your project is outside Miami-Dade. We can do it, but we settle the scope and the travel by talking."
+        }
+      },
+      {
+        "tipo": "call",
+        "si": [
+          {
+            "s": "estructural"
+          }
+        ],
+        "texto": {
+          "es": "Tu proyecto mueve paredes o toca la fachada. Eso necesita un arquitecto o ingeniero con licencia, así que lo armamos contigo antes de dar un número.",
+          "en": "Your project moves walls or touches the façade. That needs a licensed architect or engineer, so we work it out with you before giving a number."
+        }
+      },
+      {
+        "tipo": "call",
+        "si": [
+          {
+            "s": "unidades",
+            "op": ">",
+            "v": 6
+          }
+        ],
+        "texto": {
+          "es": "Tu proyecto tiene {unidades} espacios. A ese tamaño el precio lo armamos contigo, no con una calculadora.",
+          "en": "Your project has {unidades} spaces. At that size we build the price with you, not with a calculator."
+        }
+      },
+      {
+        "tipo": "call",
+        "si": [
+          {
+            "s": "campo",
+            "f": "finish",
+            "op": "es",
+            "v": "Lujo"
+          },
+          {
+            "s": "obra_nueva"
+          }
+        ],
+        "texto": {
+          "es": "Nivel lujo en obra nueva. Eso lo conversamos antes de darte un número.",
+          "en": "Luxury level in new construction. We talk that through before giving you a number."
+        }
+      },
+      {
+        "tipo": "call",
+        "si": [
+          {
+            "s": "campo",
+            "f": "health",
+            "op": "es",
+            "v": "Sí"
+          }
+        ],
+        "texto": {
+          "es": "Un proyecto que pasa por el departamento de salud tiene su propio calendario. Lo armamos contigo antes de hablar de precio.",
+          "en": "A project that goes through the health department has its own timeline. We work it out with you before talking price."
+        }
+      },
+      {
+        "tipo": "range",
+        "si": [
+          {
+            "s": "sin_definir",
+            "op": ">=",
+            "v": 4
+          }
+        ],
+        "texto": {
+          "es": "Quedaron varias cosas por definir, así que en vez de un número te mandamos un rango y lo cerramos contigo en una llamada.",
+          "en": "Several things are still undefined, so instead of a number we'll send you a range and close it with you on a call."
+        }
+      }
+    ],
+    "rutaDefecto": {
+      "tipo": "mail",
+      "texto": {
+        "es": "Vamos a revisar lo que nos contaste y te escribimos para hablar del precio y el plazo. Nada de esto es automático: lo mira una persona del estudio.",
+        "en": "We'll go over what you told us and write to you about price and timeline. None of this is automatic: a person at the studio looks at it."
+      }
+    },
+    "titulos": {
+      "call": {
+        "es": "Vamos a hablar",
+        "en": "Let's talk"
+      },
+      "range": {
+        "es": "Te enviamos un rango",
+        "en": "We'll send you a range"
+      },
+      "mail": {
+        "es": "Recibimos tu proyecto",
+        "en": "We got your project"
+      }
+    },
+    "avisos": [
+      {
+        "si": [
+          {
+            "s": "campo",
+            "f": "finish",
+            "op": "es",
+            "v": "Lujo"
+          },
+          {
+            "s": "espacios",
+            "op": "<=",
+            "v": 2
+          }
+        ],
+        "texto": {
+          "es": "Elegiste nivel lujo. A ese nivel de acabado tu contratista va a pedir planos y guía de materiales, y eso entra a partir de Premium.",
+          "en": "You chose the luxury level. At that finish level your contractor will ask for drawings and a materials guide, and that starts at Premium."
+        }
+      },
+      {
+        "si": [
+          {
+            "s": "espacios",
+            "op": ">",
+            "v": 4
+          }
+        ],
+        "texto": {
+          "es": "Tu proyecto tiene {espacios} espacios. Borsoga Edition está pensado para proyectos de este tamaño.",
+          "en": "Your project has {espacios} spaces. Borsoga Edition is made for projects this size."
+        }
+      }
+    ]
+  },
+  "ajustes": {
+    "ciudades": [
+      "miami",
+      "miami beach",
+      "miami gardens",
+      "miami lakes",
+      "miami shores",
+      "miami springs",
+      "north miami",
+      "north miami beach",
+      "south miami",
+      "west miami",
+      "coral gables",
+      "hialeah",
+      "hialeah gardens",
+      "doral",
+      "aventura",
+      "key biscayne",
+      "homestead",
+      "florida city",
+      "kendall",
+      "pinecrest",
+      "palmetto bay",
+      "cutler bay",
+      "sunny isles beach",
+      "bal harbour",
+      "bay harbor islands",
+      "surfside",
+      "coconut grove",
+      "brickell",
+      "opa-locka",
+      "opa locka",
+      "sweetwater",
+      "virginia gardens",
+      "medley",
+      "golden beach",
+      "indian creek",
+      "el portal",
+      "biscayne park",
+      "north bay village"
+    ]
+  },
+  "textos": {
+    "q_plan_none": {
+      "es": "Sin plan todavía",
+      "en": "No plan yet",
+      "grupo": "cabecera",
+      "o": 0
+    },
+    "step_counter": {
+      "es": "Paso {n} de 6",
+      "en": "Step {n} of 6",
+      "grupo": "cabecera",
+      "o": 1
+    },
+    "q_plan_sug": {
+      "es": "Sugerido",
+      "en": "Suggested",
+      "grupo": "p1",
+      "o": 2
+    },
+    "q_missing": {
+      "es": "Falta responder esto",
+      "en": "This one still needs an answer",
+      "grupo": "p1",
+      "o": 3
+    },
+    "q_missing_many": {
+      "es": "Faltan {n} respuestas",
+      "en": "{n} answers to go",
+      "grupo": "p1",
+      "o": 4
+    },
+    "qi_imgs_per_space": {
+      "es": "{n} imágenes por espacio",
+      "en": "{n} images per space",
+      "grupo": "p2",
+      "o": 5
+    },
+    "qi_sqft_q": {
+      "es": "¿Sabes cuántos pies cuadrados tiene?",
+      "en": "Do you know the square footage?",
+      "grupo": "p2",
+      "o": 6
+    },
+    "qi_optional": {
+      "es": "Opcional",
+      "en": "Optional",
+      "grupo": "p2",
+      "o": 7
+    },
+    "qi_images_total": {
+      "es": "imágenes en total con lo que elegiste",
+      "en": "images in total with what you picked",
+      "grupo": "p2",
+      "o": 8
+    },
+    "q_missing_one": {
+      "es": "Falta 1 respuesta",
+      "en": "1 answer to go",
+      "grupo": "p2",
+      "o": 9
+    },
+    "qi_nomaterial": {
+      "es": "Todavía no tengo material",
+      "en": "I don't have material yet",
+      "grupo": "p3",
+      "o": 10
+    },
+    "qi_photos_privacy": {
+      "es": "Tus fotos se guardan de forma segura, las ve solo el equipo de Borsoga Studio y no se comparten con nadie más.",
+      "en": "Your photos are stored securely, only the Borsoga Studio team sees them and they are not shared with anyone else.",
+      "grupo": "p3",
+      "o": 11
+    },
+    "qi_outside_fl": {
+      "es": "Fuera de Florida lo revisamos contigo antes de hablar de precio.",
+      "en": "Outside Florida we review it with you before talking price.",
+      "grupo": "p6",
+      "o": 12
+    },
+    "qi_privacy_accept": {
+      "es": "He leído y acepto la {link}",
+      "en": "I have read and accept the {link}",
+      "grupo": "p6",
+      "o": 13
+    },
+    "qi_privacy_link": {
+      "es": "política de privacidad",
+      "en": "privacy policy",
+      "grupo": "p6",
+      "o": 14
+    },
+    "qi_not_contract": {
+      "es": "Esto no es un contrato ni una cotización. Es la información con la que preparamos tu propuesta.",
+      "en": "This is not a contract or a quote. It's the information we use to prepare your proposal.",
+      "grupo": "p6",
+      "o": 15
+    },
+    "qi_your_plan": {
+      "es": "Tu plan",
+      "en": "Your plan",
+      "grupo": "final",
+      "o": 16
+    },
+    "qi_plan_reco": {
+      "es": "Por lo que nos contaste, el plan que te sirve es <strong>{plan}</strong>. Te mandamos el estimado con esa base y lo ajustamos si prefieres otro.",
+      "en": "From what you told us, the plan that fits is <strong>{plan}</strong>. We'll send the estimate on that basis and adjust it if you prefer another.",
+      "grupo": "final",
+      "o": 17
+    },
+    "qi_confirm_visit": {
+      "es": "El estimado se confirma en la visita al sitio.",
+      "en": "The estimate is confirmed on the site visit.",
+      "grupo": "final",
+      "o": 18
+    },
+    "qi_photos_what": {
+      "es": "Qué necesitamos ver",
+      "en": "What we need to see",
+      "grupo": "p3",
+      "o": 19
+    },
+    "qi_photos_list": {
+      "es": "Una general desde la entrada · Una de cada pared principal · Una de las ventanas · Si hay algo que hoy te molesta, fotografíalo",
+      "en": "One general shot from the entrance · One of each main wall · One of the windows · If something bothers you today, photograph it",
+      "grupo": "p3",
+      "o": 20
+    },
+    "qi_nomaterial_note": {
+      "es": "Sin fotos ni planos podemos seguir, pero tu estimado va a ser un rango, no un número. Lo cerramos en la visita a tu espacio.",
+      "en": "Without photos or drawings we can still go on, but your estimate will be a range, not a number. We settle it on the visit to your space.",
+      "grupo": "p3",
+      "o": 21
+    },
+    "qi_referral_note": {
+      "es": "Lo anotamos: te presentamos contratistas con los que ya hemos trabajado.",
+      "en": "Noted: we'll introduce you to contractors we've already worked with.",
+      "grupo": "p6",
+      "o": 22
+    },
+    "qi_a_note": {
+      "es": "Una nota",
+      "en": "One note",
+      "grupo": "p5",
+      "o": 23
+    },
+    "srv_email_bad": {
+      "es": "Escríbelo completo, con arroba y dominio: nombre@correo.com",
+      "en": "That doesn't look like an email address.",
+      "grupo": "p1",
+      "o": 24
+    },
+    "qi_structural": {
+      "es": "Los cambios de fachada o de paredes estructurales necesitan un arquitecto o ingeniero con licencia, y eso no está incluido en ningún plan. Podemos coordinar con el tuyo, o ayudarte a encontrar uno.",
+      "en": "Façade changes or structural walls need a licensed architect or engineer, and that is not included in any plan. We can coordinate with yours, or help you find one.",
+      "grupo": "p1",
+      "o": 25
+    },
+    "qi_didyoumean": {
+      "es": "¿Quisiste decir <strong>{email}</strong>?",
+      "en": "Did you mean <strong>{email}</strong>?",
+      "grupo": "p1",
+      "o": 26
+    },
+    "srv_fix": {
+      "es": "Sí, corregir",
+      "en": "Yes, fix it",
+      "grupo": "p1",
+      "o": 27
+    },
+    "qi_appl_note": {
+      "es": "Lo anotamos: la selección de electrodomésticos entra como parte de tu propuesta.",
+      "en": "Noted: appliance selection comes as part of your proposal.",
+      "grupo": "p3",
+      "o": 28
+    },
+    "qi_plan_picked": {
+      "es": "Elegiste <strong>{plan}</strong>. Preparamos el estimado con esa base.",
+      "en": "You chose <strong>{plan}</strong>. We prepare the estimate on that basis.",
+      "grupo": "final",
+      "o": 29
+    },
+    "Paso 01 de 06": {
+      "es": "Paso 01 de 06",
+      "en": "Step 01 of 06",
+      "grupo": "cabecera",
+      "o": 30
+    },
+    "Tu proyecto": {
+      "es": "Tu proyecto",
+      "en": "Your project",
+      "grupo": "cabecera",
+      "o": 31
+    },
+    "¿Para qué es este proyecto?": {
+      "es": "¿Para qué es este proyecto?",
+      "en": "What is this project for?",
+      "grupo": "cabecera",
+      "o": 32
+    },
+    "Continuar": {
+      "es": "Continuar",
+      "en": "Continue",
+      "grupo": "cabecera",
+      "o": 33
+    },
+    "Guardado": {
+      "es": "Guardado",
+      "en": "Saved",
+      "grupo": "p1",
+      "o": 34
+    },
+    "¿Es para vender o para rentar?": {
+      "es": "¿Es para vender o para rentar?",
+      "en": "Is it to sell or to rent?",
+      "grupo": "p1",
+      "o": 35
+    },
+    "¿Ya es tuya?": {
+      "es": "¿Ya es tuya?",
+      "en": "Is it yours yet?",
+      "grupo": "p1",
+      "o": 36
+    },
+    "¿Qué tipo de propiedad es?": {
+      "es": "¿Qué tipo de propiedad es?",
+      "en": "What kind of property is it?",
+      "grupo": "p1",
+      "o": 37
+    },
+    "¿Obra nueva o remodelación?": {
+      "es": "¿Obra nueva o remodelación?",
+      "en": "New build or remodel?",
+      "grupo": "p1",
+      "o": 38
+    },
+    "¿En qué etapa está la obra?": {
+      "es": "¿En qué etapa está la obra?",
+      "en": "What stage is the work at?",
+      "grupo": "p1",
+      "o": 39
+    },
+    "tu@correo.com": {
+      "es": "tu@correo.com",
+      "en": "you@email.com",
+      "grupo": "p1",
+      "o": 40
+    },
+    "¿A dónde te guardamos el avance?": {
+      "es": "¿A dónde te guardamos el avance?",
+      "en": "Where should we save your progress?",
+      "grupo": "p1",
+      "o": 41
+    },
+    "Lo guardamos en este navegador para que puedas volver donde quedaste. Te lo pedimos también para poder contactarte.": {
+      "es": "Lo guardamos en este navegador para que puedas volver donde quedaste. Te lo pedimos también para poder contactarte.",
+      "en": "We save it in this browser so you can come back where you left off. We also ask for it so we can contact you.",
+      "grupo": "p1",
+      "o": 42
+    },
+    "Paso 02 de 06": {
+      "es": "Paso 02 de 06",
+      "en": "Step 02 of 06",
+      "grupo": "p2",
+      "o": 43
+    },
+    "Tus espacios y su tamaño": {
+      "es": "Tus espacios y su tamaño",
+      "en": "Your spaces",
+      "grupo": "p2",
+      "o": 44
+    },
+    "¿Qué espacios quieres diseñar?": {
+      "es": "¿Qué espacios quieres diseñar?",
+      "en": "Which spaces do you want to design?",
+      "grupo": "p2",
+      "o": 45
+    },
+    "Elige todos los que quieras. No hay mínimo: puedes contratar uno solo. Si tienes más de uno, ajusta la cantidad.": {
+      "es": "Elige todos los que quieras. No hay mínimo: puedes contratar uno solo. Si tienes más de uno, ajusta la cantidad.",
+      "en": "Pick as many as you want. There's no minimum: you can hire just one. If you have more than one, adjust the quantity.",
+      "grupo": "p2",
+      "o": 46
+    },
+    "¿Vas a conservar muebles que ya tienes?": {
+      "es": "¿Vas a conservar muebles que ya tienes?",
+      "en": "Will you keep furniture you already have?",
+      "grupo": "p2",
+      "o": 47
+    },
+    "Enlace a tu lista o tablero (opcional)": {
+      "es": "Enlace a tu lista o tablero (opcional)",
+      "en": "Link to your list or board (optional)",
+      "grupo": "p2",
+      "o": 48
+    },
+    "¿Ya tienes piezas de mobiliario decididas?": {
+      "es": "¿Ya tienes piezas de mobiliario decididas?",
+      "en": "Have you decided on any furniture pieces?",
+      "grupo": "p2",
+      "o": 49
+    },
+    "Opcional": {
+      "es": "Opcional",
+      "en": "Optional",
+      "grupo": "p2",
+      "o": 50
+    },
+    "¿Qué tan grande es tu proyecto?": {
+      "es": "¿Qué tan grande es tu proyecto?",
+      "en": "How big is your project?",
+      "grupo": "p2",
+      "o": 51
+    },
+    "Una idea general basta. Los detalles los tomamos en la visita.": {
+      "es": "Una idea general basta. Los detalles los tomamos en la visita.",
+      "en": "A general idea is enough. We take the details on the visit.",
+      "grupo": "p2",
+      "o": 52
+    },
+    "¿Cuánto piensas invertir en obra y mobiliario?": {
+      "es": "¿Cuánto piensas invertir en obra y mobiliario?",
+      "en": "How much are you thinking of investing in works and furniture?",
+      "grupo": "p2",
+      "o": 53
+    },
+    "Es opcional, pero si nos lo compartes ajustamos el estimado a tu realidad en vez de darte un rango amplio.": {
+      "es": "Es opcional, pero si nos lo compartes ajustamos el estimado a tu realidad en vez de darte un rango amplio.",
+      "en": "It's optional, but if you share it we tune the estimate to your situation instead of giving you a wide range.",
+      "grupo": "p2",
+      "o": 54
+    },
+    "Paso 03 de 06": {
+      "es": "Paso 03 de 06",
+      "en": "Step 03 of 06",
+      "grupo": "p3",
+      "o": 55
+    },
+    "Tu espacio en detalle": {
+      "es": "Tu espacio en detalle",
+      "en": "Your space in detail",
+      "grupo": "p3",
+      "o": 56
+    },
+    "¿En cuáles se van a hacer muebles a la medida?": {
+      "es": "¿En cuáles se van a hacer muebles a la medida?",
+      "en": "Which ones will have custom furniture made?",
+      "grupo": "p3",
+      "o": 57
+    },
+    "Gabinetes de cocina, clósets, muebles de baño, paneles de pared, libreros. Lo contrario es comprar todo ya hecho.": {
+      "es": "Gabinetes de cocina, clósets, muebles de baño, paneles de pared, libreros. Lo contrario es comprar todo ya hecho.",
+      "en": "Kitchen cabinets, closets, bathroom vanities, wall panels, bookcases. The alternative is buying everything ready-made.",
+      "grupo": "p3",
+      "o": 58
+    },
+    "Sube los planos o el material del desarrollo": {
+      "es": "Sube los planos o el material del desarrollo",
+      "en": "Upload the drawings or the development's material",
+      "grupo": "p3",
+      "o": 59
+    },
+    "Imágenes o PDF. Lo que te haya dado el desarrollador sirve.": {
+      "es": "Imágenes o PDF. Lo que te haya dado el desarrollador sirve.",
+      "en": "Images or PDF. Whatever the developer gave you works.",
+      "grupo": "p3",
+      "o": 60
+    },
+    "Elegir": {
+      "es": "Elegir",
+      "en": "Choose",
+      "grupo": "p3",
+      "o": 61
+    },
+    "Fotos del lugar, si ya se puede entrar": {
+      "es": "Fotos del lugar, si ya se puede entrar",
+      "en": "Photos of the place, if you can get in yet",
+      "grupo": "p3",
+      "o": 62
+    },
+    "Opcional.": {
+      "es": "Opcional.",
+      "en": "Optional",
+      "grupo": "p3",
+      "o": 63
+    },
+    "Muéstranos el proyecto": {
+      "es": "Muéstranos el proyecto",
+      "en": "Show us the project",
+      "grupo": "p3",
+      "o": 64
+    },
+    "En obra nueva no hay fotos. Necesitamos los planos o el material del desarrollo.": {
+      "es": "En obra nueva no hay fotos. Necesitamos los planos o el material del desarrollo.",
+      "en": "In new construction there are no photos. We need the drawings or the development's material.",
+      "grupo": "p3",
+      "o": 65
+    },
+    "Paso 04 de 06": {
+      "es": "Paso 04 de 06",
+      "en": "Step 04 of 06",
+      "grupo": "p4",
+      "o": 66
+    },
+    "Nivel de acabado": {
+      "es": "Nivel de acabado",
+      "en": "Finish level",
+      "grupo": "p4",
+      "o": 67
+    },
+    "Proyecto real": {
+      "es": "Proyecto real",
+      "en": "Real project",
+      "grupo": "p4",
+      "o": 68
+    },
+    "Estas son tres cocinas nuestras. Señala la que se parece a lo que quieres.": {
+      "es": "Estas son tres cocinas nuestras. Señala la que se parece a lo que quieres.",
+      "en": "These are three of our kitchens. Point to the one closest to what you want.",
+      "grupo": "p4",
+      "o": 69
+    },
+    "Paso 05 de 06": {
+      "es": "Paso 05 de 06",
+      "en": "Step 05 of 06",
+      "grupo": "p5",
+      "o": 70
+    },
+    "Extras": {
+      "es": "Extras",
+      "en": "Extras",
+      "grupo": "p5",
+      "o": 71
+    },
+    "Se cotizan aparte. Lo que no marques aquí queda fuera de tu proyecto.": {
+      "es": "Se cotizan aparte. Lo que no marques aquí queda fuera de tu proyecto.",
+      "en": "These are quoted separately. Whatever you don't tick here stays out of your project.",
+      "grupo": "p5",
+      "o": 72
+    },
+    "¿Vas a necesitar algo más cuando esté terminado?": {
+      "es": "¿Vas a necesitar algo más cuando esté terminado?",
+      "en": "Will you need anything else once it's finished?",
+      "grupo": "p5",
+      "o": 73
+    },
+    "Paso 06 de 06": {
+      "es": "Paso 06 de 06",
+      "en": "Step 06 of 06",
+      "grupo": "p6",
+      "o": 74
+    },
+    "Tus datos": {
+      "es": "Tus datos",
+      "en": "Your details",
+      "grupo": "p6",
+      "o": 75
+    },
+    "Nombre legal completo": {
+      "es": "Nombre legal completo",
+      "en": "Full legal name",
+      "grupo": "p6",
+      "o": 76
+    },
+    "Correo": {
+      "es": "Correo",
+      "en": "Email",
+      "grupo": "p6",
+      "o": 77
+    },
+    "Teléfono": {
+      "es": "Teléfono",
+      "en": "Phone",
+      "grupo": "p6",
+      "o": 78
+    },
+    "Nombre legal de la empresa": {
+      "es": "Nombre legal de la empresa",
+      "en": "Company's legal name",
+      "grupo": "p6",
+      "o": 79
+    },
+    "Estado de registro": {
+      "es": "Estado de registro",
+      "en": "State of registration",
+      "grupo": "p6",
+      "o": 80
+    },
+    "Quién firma": {
+      "es": "Quién firma",
+      "en": "Who signs",
+      "grupo": "p6",
+      "o": 81
+    },
+    "Su cargo": {
+      "es": "Su cargo",
+      "en": "Their title",
+      "grupo": "p6",
+      "o": 82
+    },
+    "¿Firmas a título personal o como empresa?": {
+      "es": "¿Firmas a título personal o como empresa?",
+      "en": "Are you signing personally or as a company?",
+      "grupo": "p6",
+      "o": 83
+    },
+    "¿Eres el dueño de la propiedad?": {
+      "es": "¿Eres el dueño de la propiedad?",
+      "en": "Are you the owner of the property?",
+      "grupo": "p6",
+      "o": 84
+    },
+    "¿Quién decide en este proyecto?": {
+      "es": "¿Quién decide en este proyecto?",
+      "en": "Who decides on this project?",
+      "grupo": "p6",
+      "o": 85
+    },
+    "Calle y número": {
+      "es": "Calle y número",
+      "en": "Street and number",
+      "grupo": "p6",
+      "o": 86
+    },
+    "Ciudad": {
+      "es": "Ciudad",
+      "en": "City",
+      "grupo": "p6",
+      "o": 87
+    },
+    "Estado": {
+      "es": "Estado",
+      "en": "State",
+      "grupo": "p6",
+      "o": 88
+    },
+    "Código postal": {
+      "es": "Código postal",
+      "en": "ZIP code",
+      "grupo": "p6",
+      "o": 89
+    },
+    "Dirección del proyecto": {
+      "es": "Dirección del proyecto",
+      "en": "Project address",
+      "grupo": "p6",
+      "o": 90
+    },
+    "¿Cuándo quieres empezar?": {
+      "es": "¿Cuándo quieres empezar?",
+      "en": "When do you want to start?",
+      "grupo": "p6",
+      "o": 91
+    },
+    "¿Tienes una fecha límite?": {
+      "es": "¿Tienes una fecha límite?",
+      "en": "Do you have a deadline?",
+      "grupo": "p6",
+      "o": 92
+    },
+    "¿Ya trabajas con un contratista o un arquitecto?": {
+      "es": "¿Ya trabajas con un contratista o un arquitecto?",
+      "en": "Are you already working with a contractor or an architect?",
+      "grupo": "p6",
+      "o": 93
+    },
+    "¿Podemos publicar tu proyecto terminado?": {
+      "es": "¿Podemos publicar tu proyecto terminado?",
+      "en": "May we publish your finished project?",
+      "grupo": "p6",
+      "o": 94
+    },
+    "Nos ayuda a mostrar nuestro trabajo. Lo confirmamos en el contrato.": {
+      "es": "Nos ayuda a mostrar nuestro trabajo. Lo confirmamos en el contrato.",
+      "en": "It helps us show our work. We confirm it in the contract.",
+      "grupo": "p6",
+      "o": 95
+    },
+    "Enviar mi proyecto": {
+      "es": "Enviar mi proyecto",
+      "en": "Send my project",
+      "grupo": "p6",
+      "o": 96
+    },
+    "Listo": {
+      "es": "Listo",
+      "en": "Done",
+      "grupo": "final",
+      "o": 97
+    },
+    "pies²": {
+      "es": "pies²",
+      "en": "sq ft",
+      "grupo": "final",
+      "o": 98
+    },
+    "en total": {
+      "es": "en total",
+      "en": "in total",
+      "grupo": "final",
+      "o": 99
+    },
+    "Plan recomendado": {
+      "es": "Plan recomendado",
+      "en": "Recommended plan",
+      "grupo": "final",
+      "o": 100
+    },
+    "Proyecto": {
+      "es": "Proyecto",
+      "en": "Project",
+      "grupo": "final",
+      "o": 101
+    },
+    "Obra": {
+      "es": "Obra",
+      "en": "Construction",
+      "grupo": "final",
+      "o": 102
+    },
+    "Espacios": {
+      "es": "Espacios",
+      "en": "Spaces",
+      "grupo": "final",
+      "o": 103
+    },
+    "Muebles a la medida": {
+      "es": "Muebles a la medida",
+      "en": "Custom-built furniture",
+      "grupo": "final",
+      "o": 104
+    },
+    "Piezas decididas": {
+      "es": "Piezas decididas",
+      "en": "Pieces decided",
+      "grupo": "final",
+      "o": 105
+    },
+    "Tamaño": {
+      "es": "Tamaño",
+      "en": "Size",
+      "grupo": "final",
+      "o": 106
+    },
+    "Imágenes": {
+      "es": "Imágenes",
+      "en": "Images",
+      "grupo": "final",
+      "o": 107
+    },
+    "Punto de partida": {
+      "es": "Punto de partida",
+      "en": "Starting point",
+      "grupo": "final",
+      "o": 108
+    },
+    "Dirección": {
+      "es": "Dirección",
+      "en": "Address",
+      "grupo": "final",
+      "o": 109
+    },
+    "Cuándo": {
+      "es": "Cuándo",
+      "en": "When",
+      "grupo": "final",
+      "o": 110
+    },
+    "Quién decide": {
+      "es": "Quién decide",
+      "en": "Who decides",
+      "grupo": "final",
+      "o": 111
+    },
+    "Portafolio": {
+      "es": "Portafolio",
+      "en": "Portfolio",
+      "grupo": "final",
+      "o": 112
+    },
+    "Más al terminar": {
+      "es": "Más al terminar",
+      "en": "More on completion",
+      "grupo": "final",
+      "o": 113
+    },
+    "¿De qué año es aproximadamente la propiedad?": {
+      "es": "¿De qué año es aproximadamente la propiedad?",
+      "en": "Roughly what year is the property from?",
+      "grupo": "p1",
+      "o": 114
+    },
+    "¿El proyecto incluye alguno de estos?": {
+      "es": "¿El proyecto incluye alguno de estos?",
+      "en": "Does the project include any of these?",
+      "grupo": "p1",
+      "o": 115
+    },
+    "Marca todo lo que aplique.": {
+      "es": "Marca todo lo que aplique.",
+      "en": "Tick everything that applies.",
+      "grupo": "p1",
+      "o": 116
+    },
+    "¿Tu comunidad tiene HOA con reglas de diseño?": {
+      "es": "¿Tu comunidad tiene HOA con reglas de diseño?",
+      "en": "Does your community have an HOA with design rules?",
+      "grupo": "p3",
+      "o": 117
+    },
+    "Toma o elige tus fotos": {
+      "es": "Toma o elige tus fotos",
+      "en": "Take or pick your photos",
+      "grupo": "p3",
+      "o": 118
+    },
+    "De 3 a 6 fotos. Con el celular basta.": {
+      "es": "De 3 a 6 fotos. Con el celular basta.",
+      "en": "3 to 6 photos. Your phone is enough.",
+      "grupo": "p3",
+      "o": 119
+    },
+    "Tus planos, si los tienes": {
+      "es": "Tus planos, si los tienes",
+      "en": "Your drawings, if you have them",
+      "grupo": "p3",
+      "o": 120
+    },
+    "Opcional. Imágenes o PDF.": {
+      "es": "Opcional. Imágenes o PDF.",
+      "en": "Optional. Images or PDF.",
+      "grupo": "p3",
+      "o": 121
+    },
+    "Muéstranos tu espacio": {
+      "es": "Muéstranos tu espacio",
+      "en": "Show us your space",
+      "grupo": "p3",
+      "o": 122
+    },
+    "Necesitamos verlo para darte un estimado real. Con el celular basta.": {
+      "es": "Necesitamos verlo para darte un estimado real. Con el celular basta.",
+      "en": "We need to see it to give you a real estimate. Your phone is enough.",
+      "grupo": "p3",
+      "o": 123
+    },
+    "¿Qué tan claro tienes lo que quieres?": {
+      "es": "¿Qué tan claro tienes lo que quieres?",
+      "en": "How clear are you on what you want?",
+      "grupo": "p4",
+      "o": 124
+    },
+    "Nombre del dueño": {
+      "es": "Nombre del dueño",
+      "en": "Owner's name",
+      "grupo": "p6",
+      "o": 125
+    },
+    "Correo del dueño": {
+      "es": "Correo del dueño",
+      "en": "Owner's email",
+      "grupo": "p6",
+      "o": 126
+    },
+    "¿Qué te haría decidirte? (opcional)": {
+      "es": "¿Qué te haría decidirte? (opcional)",
+      "en": "What would make you decide? (optional)",
+      "grupo": "p6",
+      "o": 127
+    },
+    "Propiedad": {
+      "es": "Propiedad",
+      "en": "Property",
+      "grupo": "final",
+      "o": 128
+    },
+    "Mobiliario que conserva": {
+      "es": "Mobiliario que conserva",
+      "en": "Furniture being kept",
+      "grupo": "final",
+      "o": 129
+    },
+    "Paredes y fachada": {
+      "es": "Paredes y fachada",
+      "en": "Walls and facade",
+      "grupo": "final",
+      "o": 130
+    },
+    "HOA": {
+      "es": "HOA",
+      "en": "HOA",
+      "grupo": "final",
+      "o": 131
+    },
+    "Presupuesto declarado": {
+      "es": "Presupuesto declarado",
+      "en": "Budget",
+      "grupo": "final",
+      "o": 132
+    },
+    "Fecha límite": {
+      "es": "Fecha límite",
+      "en": "Deadline",
+      "grupo": "final",
+      "o": 133
+    },
+    "¿Se van a mover los puntos de agua o desagüe?": {
+      "es": "¿Se van a mover los puntos de agua o desagüe?",
+      "en": "Will the water or drainage points be moved?",
+      "grupo": "p3",
+      "o": 134
+    },
+    "Motivo: mudanza, cierre de compra, apertura, otro": {
+      "es": "Motivo: mudanza, cierre de compra, apertura, otro",
+      "en": "What's driving it? (move-in, closing, opening…)",
+      "grupo": "p6",
+      "o": 135
+    },
+    "Todavía sin material": {
+      "es": "Todavía sin material",
+      "en": "No material yet",
+      "grupo": "final",
+      "o": 136
+    },
+    "Ninguno": {
+      "es": "Ninguno",
+      "en": "None",
+      "grupo": "final",
+      "o": 137
+    },
+    "Pide que le recomendemos contratista.": {
+      "es": "Pide que le recomendemos contratista.",
+      "en": "Asks us to recommend a contractor.",
+      "grupo": "final",
+      "o": 138
+    },
+    "Fuera de Miami-Dade.": {
+      "es": "Fuera de Miami-Dade.",
+      "en": "Outside Miami-Dade.",
+      "grupo": "final",
+      "o": 139
+    },
+    "Agua y desagüe": {
+      "es": "Agua y desagüe",
+      "en": "Water and drainage",
+      "grupo": "final",
+      "o": 140
+    },
+    "Material": {
+      "es": "Material",
+      "en": "Material",
+      "grupo": "final",
+      "o": 141
+    },
+    "Marcado": {
+      "es": "Marcado",
+      "en": "Flagged",
+      "grupo": "final",
+      "o": 142
+    },
+    "¿El edificio pide aprobación de la asociación o del condominio?": {
+      "es": "¿El edificio pide aprobación de la asociación o del condominio?",
+      "en": "Does the building require association or condo approval?",
+      "grupo": "p3",
+      "o": 143
+    },
+    "¿Qué tipo de espacio comercial?": {
+      "es": "¿Qué tipo de espacio comercial?",
+      "en": "What kind of commercial space?",
+      "grupo": "p1",
+      "o": 144
+    },
+    "¿El local está vacío o en operación?": {
+      "es": "¿El local está vacío o en operación?",
+      "en": "Is the space empty or in operation?",
+      "grupo": "p1",
+      "o": 145
+    },
+    "Súbenos la lista o las fichas técnicas": {
+      "es": "Súbenos la lista o las fichas técnicas",
+      "en": "Upload the list or the spec sheets",
+      "grupo": "p3",
+      "o": 146
+    },
+    "¿Ya elegiste los electrodomésticos?": {
+      "es": "¿Ya elegiste los electrodomésticos?",
+      "en": "Have you chosen the appliances?",
+      "grupo": "p3",
+      "o": 147
+    },
+    "Las medidas de los electrodomésticos definen toda la gabinetería, así que conviene tenerlos decididos antes de empezar.": {
+      "es": "Las medidas de los electrodomésticos definen toda la gabinetería, así que conviene tenerlos decididos antes de empezar.",
+      "en": "Appliance dimensions define all the cabinetry, so it's worth deciding on them before we start.",
+      "grupo": "p3",
+      "o": 148
+    },
+    "¿Ya elegiste la lavadora y la secadora?": {
+      "es": "¿Ya elegiste la lavadora y la secadora?",
+      "en": "Have you chosen the washer and dryer?",
+      "grupo": "p3",
+      "o": 149
+    },
+    "¿Cómo van a ir?": {
+      "es": "¿Cómo van a ir?",
+      "en": "How will they go?",
+      "grupo": "p3",
+      "o": 150
+    },
+    "Apiladas ocupan menos; lado a lado piden más frente de pared.": {
+      "es": "Apiladas ocupan menos; lado a lado piden más frente de pared.",
+      "en": "Stacked takes less room; side by side needs more wall width.",
+      "grupo": "p3",
+      "o": 151
+    },
+    "Obra estructural o de fachada. Lo revisamos antes de cotizar.": {
+      "es": "Obra estructural o de fachada. Lo revisamos antes de cotizar.",
+      "en": "Structural or façade work. We review it before quoting.",
+      "grupo": "final",
+      "o": 152
+    },
+    "Electrodomésticos": {
+      "es": "Electrodomésticos",
+      "en": "Appliances",
+      "grupo": "final",
+      "o": 153
+    },
+    "Asociación": {
+      "es": "Asociación",
+      "en": "Association",
+      "grupo": "final",
+      "o": 154
+    },
+    "¿El proyecto necesita aprobación del departamento de salud?": {
+      "es": "¿El proyecto necesita aprobación del departamento de salud?",
+      "en": "Does the project need health department approval?",
+      "grupo": "p3",
+      "o": 155
+    },
+    "Departamento de salud": {
+      "es": "Departamento de salud",
+      "en": "Health department",
+      "grupo": "final",
+      "o": 156
+    },
+    "¿El proyecto incluye la piscina o su área?": {
+      "es": "¿El proyecto incluye la piscina o su área?",
+      "en": "Does the project include the pool or its area?",
+      "grupo": "p3",
+      "o": 157
+    },
+    "Te escribimos en persona en menos de 48 horas": {
+      "es": "Te escribimos en persona en menos de 48 horas",
+      "en": "A person from the studio writes to you within 48 hours",
+      "grupo": "final",
+      "o": 158
+    },
+    "Piscina": {
+      "es": "Piscina",
+      "en": "Pool",
+      "grupo": "final",
+      "o": 159
+    },
+    "Todavía no tienes el local. Súbenos los planos o el material que te hayan dado. Nada aquí es obligatorio.": {
+      "es": "Todavía no tienes el local. Súbenos los planos o el material que te hayan dado. Nada aquí es obligatorio.",
+      "en": "You don't have the space yet. Upload the drawings or the material you were given. Nothing here is required.",
+      "grupo": "p3",
+      "o": 160
+    },
+    "Qué le haría decidirse": {
+      "es": "Qué le haría decidirse",
+      "en": "What would make them decide",
+      "grupo": "final",
+      "o": 161
+    },
+    "Sube lo que tengas de la propiedad": {
+      "es": "Sube lo que tengas de la propiedad",
+      "en": "Upload whatever you have on the property",
+      "grupo": "p3",
+      "o": 162
+    },
+    "Fotos del listado, planos, medidas. Imágenes o PDF.": {
+      "es": "Fotos del listado, planos, medidas. Imágenes o PDF.",
+      "en": "Listing photos, drawings, dimensions. Images or PDF.",
+      "grupo": "p3",
+      "o": 163
+    },
+    "Todavía no es tuya, así que no hay nada que fotografiar. Súbenos lo que tengas del listado o del desarrollo. Nada aquí es obligatorio.": {
+      "es": "Todavía no es tuya, así que no hay nada que fotografiar. Súbenos lo que tengas del listado o del desarrollo. Nada aquí es obligatorio.",
+      "en": "It isn't yours yet, so there's nothing to photograph. Upload whatever you have from the listing or the development. Nothing here is required.",
+      "grupo": "p3",
+      "o": 164
+    },
+    "¿Ya elegiste el equipo de la barra?": {
+      "es": "¿Ya elegiste el equipo de la barra?",
+      "en": "Have you chosen the bar equipment?",
+      "grupo": "p3",
+      "o": 165
+    },
+    "Fregadero, hielera, enfriador de bebidas, cafetera.": {
+      "es": "Fregadero, hielera, enfriador de bebidas, cafetera.",
+      "en": "Sink, ice bin, beverage cooler, coffee machine.",
+      "grupo": "p3",
+      "o": 166
+    },
+    "Equipo de barra": {
+      "es": "Equipo de barra",
+      "en": "Bar equipment",
+      "grupo": "final",
+      "o": 167
+    },
+    "¿Qué tipo de espacio es?": {
+      "es": "¿Qué tipo de espacio es?",
+      "en": "What kind of space is it?",
+      "grupo": "p1",
+      "o": 168
+    },
+    "Varias respuestas sin definir. Va a rango y a llamada.": {
+      "es": "Varias respuestas sin definir. Va a rango y a llamada.",
+      "en": "Several answers undefined. Goes to range and a call.",
+      "grupo": "final",
+      "o": 169
+    }
+  }
+} as Config,
+  av: {
+  "formato": 2,
+  "servicio": "av",
+  "clave": "borsoga.cuestionario.av.v1",
+  "listas": {
+    "projectType": {
+      "nombre": "Tipo de proyecto",
+      "ops": [
+        {
+          "es": "Residencial multifamiliar",
+          "en": "Multifamily residential"
+        },
+        {
+          "es": "Residencial unifamiliar",
+          "en": "Single-family residential"
+        },
+        {
+          "es": "Comercial",
+          "en": "Commercial",
+          "rol": "comercial"
+        },
+        {
+          "es": "Hospitalidad",
+          "en": "Hospitality",
+          "rol": "hospitalidad"
+        },
+        {
+          "es": "Uso mixto",
+          "en": "Mixed use",
+          "rol": "mixto"
+        },
+        {
+          "es": "Producto o mobiliario",
+          "en": "Product or furniture"
+        }
+      ]
+    },
+    "stage": {
+      "nombre": "Etapa",
+      "ops": [
+        {
+          "es": "Concepto",
+          "en": "Concept"
+        },
+        {
+          "es": "Diseño desarrollado",
+          "en": "Developed design"
+        },
+        {
+          "es": "En permisos",
+          "en": "In permitting"
+        },
+        {
+          "es": "En construcción",
+          "en": "Under construction"
+        },
+        {
+          "es": "Ya construido",
+          "en": "Already built"
+        }
+      ]
+    },
+    "role": {
+      "nombre": "Quién escribe",
+      "ops": [
+        {
+          "es": "Developer",
+          "en": "Developer"
+        },
+        {
+          "es": "Arquitecto o diseñador",
+          "en": "Architect or designer"
+        },
+        {
+          "es": "Fabricante",
+          "en": "Manufacturer"
+        },
+        {
+          "es": "Corredor o agencia",
+          "en": "Broker or agency"
+        },
+        {
+          "es": "Otro",
+          "en": "Other"
+        }
+      ]
+    },
+    "scenes": {
+      "nombre": "Escenas",
+      "ops": [
+        {
+          "es": "Fachada",
+          "en": "Façade",
+          "marcas": {
+            "contexto": true
+          }
+        },
+        {
+          "es": "Vista aérea",
+          "en": "Aerial view",
+          "marcas": {
+            "contexto": true
+          }
+        },
+        {
+          "es": "Exterior a nivel",
+          "en": "Street-level exterior"
+        },
+        {
+          "es": "Interior",
+          "en": "Interior",
+          "rol": "interior"
+        },
+        {
+          "es": "Detalle o producto",
+          "en": "Detail or product",
+          "marcas": {
+            "pieza": true
+          }
+        }
+      ]
+    },
+    "context": {
+      "nombre": "¿Contexto urbano?",
+      "ops": [
+        {
+          "es": "Sí, el entorno real",
+          "en": "Yes, the real surroundings"
+        },
+        {
+          "es": "Solo el edificio, sin contexto",
+          "en": "Just the building, no context"
+        },
+        {
+          "es": "No lo sé todavía",
+          "en": "I don't know yet",
+          "duda": true
+        }
+      ]
+    },
+    "rooms": {
+      "nombre": "Espacios interiores",
+      "ops": [
+        {
+          "es": "Lobby o acceso",
+          "en": "Lobby or entrance",
+          "grupo": "residencial"
+        },
+        {
+          "es": "Cocina",
+          "en": "Kitchen",
+          "grupo": "residencial"
+        },
+        {
+          "es": "Sala",
+          "en": "Living room",
+          "grupo": "residencial"
+        },
+        {
+          "es": "Comedor",
+          "en": "Dining room",
+          "grupo": "residencial"
+        },
+        {
+          "es": "Dormitorio",
+          "en": "Bedroom",
+          "grupo": "residencial"
+        },
+        {
+          "es": "Baño",
+          "en": "Bathroom",
+          "grupo": "residencial"
+        },
+        {
+          "es": "Home office",
+          "en": "Home office",
+          "grupo": "residencial"
+        },
+        {
+          "es": "Clóset o vestidor",
+          "en": "Closet or dressing room",
+          "grupo": "residencial"
+        },
+        {
+          "es": "Amenidad",
+          "en": "Amenity",
+          "grupo": "residencial",
+          "rol": "amenidad"
+        },
+        {
+          "es": "Circulación o común",
+          "en": "Circulation or common area",
+          "grupo": "residencial"
+        },
+        {
+          "es": "Recepción o lobby",
+          "en": "Reception or lobby",
+          "grupo": "comercial"
+        },
+        {
+          "es": "Área de trabajo",
+          "en": "Work area",
+          "grupo": "comercial"
+        },
+        {
+          "es": "Sala de juntas",
+          "en": "Meeting room",
+          "grupo": "comercial"
+        },
+        {
+          "es": "Piso de venta",
+          "en": "Sales floor",
+          "grupo": "comercial"
+        },
+        {
+          "es": "Restaurante o comedor",
+          "en": "Restaurant or dining room",
+          "grupo": "comercial"
+        },
+        {
+          "es": "Barra",
+          "en": "Bar",
+          "grupo": "comercial"
+        },
+        {
+          "es": "Baños",
+          "en": "Restrooms",
+          "grupo": "comercial"
+        },
+        {
+          "es": "Circulación",
+          "en": "Circulation",
+          "grupo": "comercial"
+        },
+        {
+          "es": "Lobby",
+          "en": "Lobby",
+          "grupo": "hospitalidad"
+        },
+        {
+          "es": "Habitación tipo",
+          "en": "Typical room",
+          "grupo": "hospitalidad"
+        },
+        {
+          "es": "Suite",
+          "en": "Suite",
+          "grupo": "hospitalidad"
+        },
+        {
+          "es": "Restaurante",
+          "en": "Restaurant",
+          "grupo": "hospitalidad"
+        },
+        {
+          "es": "Bar",
+          "en": "Bar",
+          "grupo": "hospitalidad"
+        },
+        {
+          "es": "Spa o gimnasio",
+          "en": "Spa or gym",
+          "grupo": "hospitalidad"
+        },
+        {
+          "es": "Salón de eventos",
+          "en": "Event hall",
+          "grupo": "hospitalidad"
+        },
+        {
+          "es": "Piscina o deck",
+          "en": "Pool or deck",
+          "grupo": "hospitalidad"
+        }
+      ]
+    },
+    "amenities": {
+      "nombre": "Amenidades",
+      "ops": [
+        {
+          "es": "Gimnasio",
+          "en": "Gym"
+        },
+        {
+          "es": "Piscina o deck",
+          "en": "Pool or deck"
+        },
+        {
+          "es": "Coworking",
+          "en": "Coworking"
+        },
+        {
+          "es": "Salón social",
+          "en": "Social lounge"
+        },
+        {
+          "es": "Spa",
+          "en": "Spa"
+        },
+        {
+          "es": "Otra",
+          "en": "Other"
+        }
+      ]
+    },
+    "interiorDesign": {
+      "nombre": "¿Interior diseñado?",
+      "ops": [
+        {
+          "es": "Sí, tengo el diseño definido",
+          "en": "Yes, I have the design defined"
+        },
+        {
+          "es": "Parcialmente",
+          "en": "Partially",
+          "marcas": {
+            "abierto": true
+          }
+        },
+        {
+          "es": "No, habría que resolverlo",
+          "en": "No, it would need resolving",
+          "marcas": {
+            "abierto": true
+          }
+        }
+      ]
+    },
+    "piece": {
+      "nombre": "¿La pieza existe?",
+      "ops": [
+        {
+          "es": "Existe y tengo el modelo",
+          "en": "It exists and I have the model"
+        },
+        {
+          "es": "Existe pero solo tengo planos o fotos",
+          "en": "It exists but I only have drawings or photos"
+        },
+        {
+          "es": "Es un diseño nuevo",
+          "en": "It's a new design"
+        }
+      ]
+    },
+    "material": {
+      "nombre": "Material del proyecto",
+      "ops": [
+        {
+          "es": "Modelo 3D listo",
+          "en": "3D model ready",
+          "rol": "modelo"
+        },
+        {
+          "es": "Planos en CAD",
+          "en": "CAD drawings"
+        },
+        {
+          "es": "Planos en PDF",
+          "en": "PDF drawings"
+        },
+        {
+          "es": "Solo bocetos o croquis",
+          "en": "Only sketches",
+          "rol": "bocetos"
+        },
+        {
+          "es": "Todavía nada",
+          "en": "Nothing yet",
+          "duda": true,
+          "rol": "ninguno"
+        }
+      ]
+    },
+    "spec": {
+      "nombre": "¿Materiales y acabados definidos?",
+      "ops": [
+        {
+          "es": "Sí, tengo la especificación",
+          "en": "Yes, I have the specification"
+        },
+        {
+          "es": "Tengo una idea general",
+          "en": "I have a general idea"
+        },
+        {
+          "es": "Todavía no",
+          "en": "Not yet",
+          "duda": true
+        }
+      ]
+    },
+    "uses": {
+      "nombre": "Uso de las imágenes",
+      "ops": [
+        {
+          "es": "Preventa y ventas",
+          "en": "Pre-sales and sales"
+        },
+        {
+          "es": "Presentación a inversionistas o banca",
+          "en": "Presentation to investors or banks"
+        },
+        {
+          "es": "Concurso o licitación",
+          "en": "Competition or tender"
+        },
+        {
+          "es": "Aprobación de diseño interno",
+          "en": "Internal design approval"
+        },
+        {
+          "es": "Redes sociales y marketing",
+          "en": "Social media and marketing"
+        },
+        {
+          "es": "Catálogo de producto",
+          "en": "Product catalogue"
+        },
+        {
+          "es": "Presentación oficial o permisos",
+          "en": "Official presentation or permits"
+        }
+      ]
+    },
+    "tone": {
+      "nombre": "Tono",
+      "ops": [
+        {
+          "es": "Neutro",
+          "en": "Neutral",
+          "slot": {
+            "es": "Proyecto real · tono neutro",
+            "en": "Real project · neutral tone"
+          }
+        },
+        {
+          "es": "Atmosférico",
+          "en": "Atmospheric",
+          "slot": {
+            "es": "Proyecto real · tono atmosférico",
+            "en": "Real project · atmospheric tone"
+          }
+        },
+        {
+          "es": "Editorial",
+          "en": "Editorial",
+          "slot": {
+            "es": "Proyecto real · tono editorial",
+            "en": "Real project · editorial tone"
+          }
+        }
+      ]
+    },
+    "extras": {
+      "nombre": "Extras",
+      "ops": [
+        {
+          "es": "Borsoga Immersive",
+          "en": "Borsoga Immersive",
+          "desc": {
+            "es": "Que tu comprador camine el proyecto antes de que existan las paredes.",
+            "en": "Let your buyer walk the project before the walls exist."
+          }
+        },
+        {
+          "es": "Tour 360",
+          "en": "Tour 360",
+          "desc": {
+            "es": "El proyecto navegable desde cualquier pantalla.",
+            "en": "The project, walkable from any screen."
+          }
+        },
+        {
+          "es": "Vistas adicionales",
+          "en": "Additional views",
+          "desc": {
+            "es": "Más cámaras dentro de una escena que ya construimos.",
+            "en": "More cameras inside a scene we already built."
+          }
+        },
+        {
+          "es": "Escenas adicionales",
+          "en": "Additional scenes",
+          "desc": {
+            "es": "Un espacio nuevo, con su modelado, su iluminación y su ambientación.",
+            "en": "A new space, with its own modeling, lighting and set dressing."
+          }
+        }
+      ]
+    },
+    "cross": {
+      "nombre": "Alrededor del proyecto",
+      "ops": [
+        {
+          "es": "Identidad o nombre del desarrollo",
+          "en": "Identity or name of the development"
+        },
+        {
+          "es": "Un sitio de preventa",
+          "en": "A pre-sales site"
+        },
+        {
+          "es": "Material para corredores",
+          "en": "Material for brokers"
+        },
+        {
+          "es": "No, por ahora no",
+          "en": "Not for now",
+          "rol": "ninguno"
+        }
+      ]
+    },
+    "signer": {
+      "nombre": "¿Firma personal o empresa?",
+      "ops": [
+        {
+          "es": "A título personal",
+          "en": "Personally",
+          "rol": "personal"
+        },
+        {
+          "es": "Como empresa",
+          "en": "As a company",
+          "rol": "empresa"
+        }
+      ]
+    },
+    "launch": {
+      "nombre": "¿Fecha de lanzamiento?",
+      "ops": [
+        {
+          "es": "No, sin fecha fija",
+          "en": "No fixed date"
+        },
+        {
+          "es": "Sí, pero es flexible",
+          "en": "Yes, but it's flexible"
+        },
+        {
+          "es": "Sí, y es fija",
+          "en": "Yes, and it's fixed",
+          "rol": "fija"
+        }
+      ]
+    },
+    "portfolio": {
+      "nombre": "¿Publicar el proyecto?",
+      "ops": [
+        {
+          "es": "Sí, sin problema",
+          "en": "Yes, no problem"
+        },
+        {
+          "es": "Sí, pero solo después de su lanzamiento",
+          "en": "Yes, but only after its launch"
+        },
+        {
+          "es": "No, está bajo confidencialidad",
+          "en": "No, it's under confidentiality"
+        }
+      ]
+    }
+  },
+  "reglas": {
+    "planDefecto": "Essential",
+    "plan": [
+      {
+        "plan": "Borsoga Edition",
+        "si": [
+          {
+            "s": "campo",
+            "f": "tone",
+            "op": "es",
+            "v": "Editorial"
+          }
+        ]
+      },
+      {
+        "plan": "Borsoga Edition",
+        "si": [
+          {
+            "s": "extras",
+            "op": ">=",
+            "v": 2
+          }
+        ]
+      },
+      {
+        "plan": "Borsoga Edition",
+        "si": [
+          {
+            "s": "escenas",
+            "op": ">",
+            "v": 6
+          }
+        ]
+      },
+      {
+        "plan": "Premium",
+        "si": [
+          {
+            "s": "campo",
+            "f": "tone",
+            "op": "es",
+            "v": "Atmosférico"
+          }
+        ]
+      },
+      {
+        "plan": "Premium",
+        "si": [
+          {
+            "s": "campo",
+            "f": "uses",
+            "op": "incluye",
+            "v": "Preventa y ventas"
+          }
+        ]
+      },
+      {
+        "plan": "Premium",
+        "si": [
+          {
+            "s": "campo",
+            "f": "uses",
+            "op": "incluye",
+            "v": "Redes sociales y marketing"
+          }
+        ]
+      }
+    ],
+    "ruta": [
+      {
+        "tipo": "call",
+        "si": [
+          {
+            "s": "plan",
+            "op": "es",
+            "v": "Borsoga Edition"
+          }
+        ],
+        "texto": {
+          "es": "Borsoga Edition se cotiza en una llamada. Tenemos todo lo que nos contaste, así que la conversación empieza donde la dejaste.",
+          "en": "A project like yours is better handled in a conversation than in an automatic number. We'll reach out to set up a call, and we'll have everything you told us in front of us."
+        }
+      },
+      {
+        "tipo": "call",
+        "si": [
+          {
+            "s": "sin_material"
+          }
+        ],
+        "texto": {
+          "es": "Todavía no hay material del proyecto. Empezamos por una llamada de arranque y ahí definimos qué necesitamos para arrancar.",
+          "en": "There's no project material yet. We start with a kick-off call, and there we define what we need to begin."
+        }
+      },
+      {
+        "tipo": "call",
+        "si": [
+          {
+            "s": "escenas",
+            "op": ">",
+            "v": 6
+          }
+        ],
+        "texto": {
+          "es": "Tu proyecto tiene {escenas} escenas. A ese volumen el precio lo armamos contigo, no con una calculadora.",
+          "en": "Your project has {escenas} scenes. At that volume we build the price with you, not with a calculator."
+        }
+      },
+      {
+        "tipo": "call",
+        "si": [
+          {
+            "s": "dias_lanzamiento",
+            "op": "<",
+            "v": 28
+          }
+        ],
+        "texto": {
+          "es": "Tu fecha está a menos de cuatro semanas. Eso lo confirmamos en una llamada antes de comprometer nada.",
+          "en": "Your date is less than four weeks away. We confirm that on a call before committing to anything."
+        }
+      },
+      {
+        "tipo": "call",
+        "si": [
+          {
+            "s": "campo",
+            "f": "projectType",
+            "op": "es",
+            "v": "Uso mixto"
+          }
+        ],
+        "texto": {
+          "es": "Uso mixto: son varias tipologías dentro de un mismo proyecto, y el alcance se define mejor hablando.",
+          "en": "Mixed use: several typologies inside one project, and the scope is better defined by talking."
+        }
+      },
+      {
+        "tipo": "range",
+        "si": [
+          {
+            "s": "sin_definir",
+            "op": ">=",
+            "v": 4
+          }
+        ],
+        "texto": {
+          "es": "Quedaron varias cosas por definir, así que en vez de un número te mandamos un rango y lo cerramos contigo en una llamada.",
+          "en": "There were a few things you weren't sure about yet, so what we send will be a range rather than a number. We close it at the visit."
+        }
+      }
+    ],
+    "rutaDefecto": {
+      "tipo": "mail",
+      "texto": {
+        "es": "Y agendamos una llamada para revisar las escenas y el calendario: el precio se cierra ahí.",
+        "en": "And we'll book a call to go over the scenes and the schedule: the price is settled there."
+      }
+    },
+    "titulos": {
+      "call": {
+        "es": "Vamos a hablar",
+        "en": "Let's talk"
+      },
+      "range": {
+        "es": "Te enviamos un rango",
+        "en": "We'll send you a range"
+      },
+      "mail": {
+        "es": "Recibimos tu proyecto",
+        "en": "We got your project"
+      }
+    },
+    "avisos": []
+  },
+  "ajustes": {
+    "vistas": {
+      "Essential": 2,
+      "Premium": 4,
+      "Borsoga Edition": 4
+    },
+    "vistasSinPlan": 2,
+    "vistasMax": 12
+  },
+  "textos": {
+    "q_plan_none": {
+      "es": "Sin plan todavía",
+      "en": "No plan yet",
+      "grupo": "cabecera",
+      "o": 0
+    },
+    "Tu proyecto": {
+      "es": "Tu proyecto",
+      "en": "Your project",
+      "grupo": "cabecera",
+      "o": 1
+    },
+    "avq_s1_type": {
+      "es": "¿Qué tipo de proyecto es?",
+      "en": "What kind of project is it?",
+      "grupo": "cabecera",
+      "o": 2
+    },
+    "step_counter": {
+      "es": "Paso {n} de 6",
+      "en": "Step {n} of 6",
+      "grupo": "cabecera",
+      "o": 3
+    },
+    "q_plan_sug": {
+      "es": "Sugerido",
+      "en": "Suggested",
+      "grupo": "p1",
+      "o": 4
+    },
+    "avq_s1_stage": {
+      "es": "¿En qué etapa está?",
+      "en": "What stage is it at?",
+      "grupo": "p1",
+      "o": 5
+    },
+    "avq_s1_role": {
+      "es": "¿Desde dónde nos escribes?",
+      "en": "Who are you writing as?",
+      "grupo": "p1",
+      "o": 6
+    },
+    "avq_step2": {
+      "es": "Las escenas",
+      "en": "The scenes",
+      "grupo": "p2",
+      "o": 7
+    },
+    "avq_s2_q": {
+      "es": "¿Qué escenas necesitas?",
+      "en": "Which scenes do you need?",
+      "grupo": "p2",
+      "o": 8
+    },
+    "q_scene_def": {
+      "es": "Una escena es un encuadre del proyecto.",
+      "en": "A scene is one framing of the project.",
+      "grupo": "p2",
+      "o": 9
+    },
+    "avq_s2_def2": {
+      "es": "Una vista es una cámara dentro de esa escena.",
+      "en": "A view is a camera inside that scene.",
+      "grupo": "p2",
+      "o": 10
+    },
+    "avq_s2_context": {
+      "es": "¿Necesitas el contexto urbano alrededor?",
+      "en": "Do you need the surrounding urban context?",
+      "grupo": "p2",
+      "o": 11
+    },
+    "avq_s2_rooms_q": {
+      "es": "¿Qué espacios interiores?",
+      "en": "Which interior spaces?",
+      "grupo": "p2",
+      "o": 12
+    },
+    "avq_s2_amen": {
+      "es": "¿Cuáles?",
+      "en": "Which ones?",
+      "grupo": "p2",
+      "o": 13
+    },
+    "avq_s2_interior_q": {
+      "es": "¿El interior ya está diseñado?",
+      "en": "Is the interior already designed?",
+      "grupo": "p2",
+      "o": 14
+    },
+    "avq_s2_int_notice": {
+      "es": "Resolver el interior es trabajo de diseño, no de visualización. Podemos hacerlo nosotros y se cotiza aparte, o trabajamos con el diseño que nos entregues.",
+      "en": "Resolving the interior is design work, not visualization. We can do it and it's quoted separately, or we work with the design you hand us.",
+      "grupo": "p2",
+      "o": 15
+    },
+    "avq_s2_piece_q": {
+      "es": "¿Es una pieza que ya existe o hay que modelarla desde cero?",
+      "en": "Does the piece already exist, or does it need modelling from scratch?",
+      "grupo": "p2",
+      "o": 16
+    },
+    "q_views_hint": {
+      "es": "Cada escena trae {n} vistas{plan}. Ajusta las que necesiten más.",
+      "en": "Each scene comes with {n} views{plan}. Adjust the ones that need more.",
+      "grupo": "p2",
+      "o": 17
+    },
+    "q_images_total": {
+      "es": "imágenes en total · {n} escenas",
+      "en": "images in total · {n} scenes",
+      "grupo": "p2",
+      "o": 18
+    },
+    "avq_step3": {
+      "es": "Qué nos entregas",
+      "en": "What you send us",
+      "grupo": "p3",
+      "o": 19
+    },
+    "avq_s3_q": {
+      "es": "¿Qué material tienes del proyecto?",
+      "en": "What project material do you have?",
+      "grupo": "p3",
+      "o": 20
+    },
+    "avq_s3_none": {
+      "es": "Sin material no podemos dar un rango. Esto pasa a una llamada de arranque, y ahí definimos qué hace falta para empezar.",
+      "en": "Without material we can't give you a range. This moves to a kick-off call, where we define what's needed to start.",
+      "grupo": "p3",
+      "o": 21
+    },
+    "avq_s3_spec": {
+      "es": "¿Tienes definidos los materiales y acabados?",
+      "en": "Have you defined materials and finishes?",
+      "grupo": "p3",
+      "o": 22
+    },
+    "avq_step4": {
+      "es": "Para qué son y con qué tono",
+      "en": "What they're for and in what tone",
+      "grupo": "p4",
+      "o": 23
+    },
+    "avq_s4_use": {
+      "es": "¿Para qué vas a usar las imágenes?",
+      "en": "What will you use the images for?",
+      "grupo": "p4",
+      "o": 24
+    },
+    "avq_s4_use_h": {
+      "es": "Define resolución, formato y qué piezas entregamos. Marca todo lo que aplique.",
+      "en": "This sets resolution, format and which pieces we deliver. Tick everything that applies.",
+      "grupo": "p4",
+      "o": 25
+    },
+    "avq_s4_tone": {
+      "es": "¿Qué tono buscas?",
+      "en": "What tone are you after?",
+      "grupo": "p4",
+      "o": 26
+    },
+    "avq_s4_tone_h": {
+      "es": "Tres proyectos nuestros. Señala el que se parece a lo que buscas.",
+      "en": "Three of our projects. Point to the one closest to what you want.",
+      "grupo": "p4",
+      "o": 27
+    },
+    "Extras": {
+      "es": "Extras",
+      "en": "Extras",
+      "grupo": "p5",
+      "o": 28
+    },
+    "avq_s5_cross": {
+      "es": "¿Vas a necesitar algo más alrededor del proyecto?",
+      "en": "Will you need anything else around the project?",
+      "grupo": "p5",
+      "o": 29
+    },
+    "avq_step6": {
+      "es": "Tú y tu proyecto",
+      "en": "You and your project",
+      "grupo": "p6",
+      "o": 30
+    },
+    "avq_s6_company": {
+      "es": "Empresa",
+      "en": "Company",
+      "grupo": "p6",
+      "o": 31
+    },
+    "avq_s6_loc": {
+      "es": "Ubicación del proyecto",
+      "en": "Project location",
+      "grupo": "p6",
+      "o": 32
+    },
+    "avq_s6_loc_h": {
+      "es": "Ciudad y país. Nos sirve para husos horarios y contexto, no para cobertura.",
+      "en": "City and country. We use it for time zones and context, not for coverage.",
+      "grupo": "p6",
+      "o": 33
+    },
+    "avq_country": {
+      "es": "País",
+      "en": "Country",
+      "grupo": "p6",
+      "o": 34
+    },
+    "avq_s6_launch": {
+      "es": "¿Tienes fecha de lanzamiento o de entrega?",
+      "en": "Do you have a launch or delivery date?",
+      "grupo": "p6",
+      "o": 35
+    },
+    "avq_s6_portfolio": {
+      "es": "¿Podemos publicar el proyecto?",
+      "en": "May we publish the project?",
+      "grupo": "p6",
+      "o": 36
+    },
+    "qi_privacy_accept": {
+      "es": "He leído y acepto la {link}",
+      "en": "I have read and accept the {link}",
+      "grupo": "p6",
+      "o": 37
+    },
+    "qi_privacy_link": {
+      "es": "política de privacidad",
+      "en": "privacy policy",
+      "grupo": "p6",
+      "o": 38
+    },
+    "q_missing": {
+      "es": "Falta responder esto",
+      "en": "This one still needs an answer",
+      "grupo": "p6",
+      "o": 39
+    },
+    "qi_not_contract": {
+      "es": "Esto no es un contrato ni una cotización. Es la información con la que preparamos tu propuesta.",
+      "en": "This is not a contract or a quote. It's the information we use to prepare your proposal.",
+      "grupo": "p6",
+      "o": 40
+    },
+    "q_missing_one": {
+      "es": "Falta 1 respuesta",
+      "en": "1 answer to go",
+      "grupo": "p6",
+      "o": 41
+    },
+    "qi_your_plan": {
+      "es": "Tu plan",
+      "en": "Your plan",
+      "grupo": "final",
+      "o": 42
+    },
+    "qi_plan_reco": {
+      "es": "Por lo que nos contaste, el plan que te sirve es <strong>{plan}</strong>. Te mandamos el estimado con esa base y lo ajustamos si prefieres otro.",
+      "en": "From what you told us, the plan that fits is <strong>{plan}</strong>. We'll send the estimate on that basis and adjust it if you prefer another.",
+      "grupo": "final",
+      "o": 43
+    },
+    "avq_sum_role": {
+      "es": "Quién escribe",
+      "en": "Who's writing",
+      "grupo": "final",
+      "o": 44
+    },
+    "avq_sum_images": {
+      "es": "Imágenes estimadas",
+      "en": "Estimated images",
+      "grupo": "final",
+      "o": 45
+    },
+    "avq_sum_interior": {
+      "es": "Diseño interior",
+      "en": "Interior design",
+      "grupo": "final",
+      "o": 46
+    },
+    "avq_flag_interior": {
+      "es": "Oportunidad de interior design: el interior no está resuelto.",
+      "en": "Interior design opportunity: the interior isn't resolved.",
+      "grupo": "final",
+      "o": 47
+    },
+    "avq_sum_use": {
+      "es": "Uso de las imágenes",
+      "en": "Image use",
+      "grupo": "final",
+      "o": 48
+    },
+    "avq_sum_location": {
+      "es": "Ubicación",
+      "en": "Location",
+      "grupo": "final",
+      "o": 49
+    },
+    "avq_s3_sketch_t": {
+      "es": "Súbenos lo que tengas",
+      "en": "Upload whatever you have",
+      "grupo": "p3",
+      "o": 50
+    },
+    "avq_s3_link_ph": {
+      "es": "Enlace de descarga (Drive, WeTransfer, Dropbox)",
+      "en": "Download link (Drive, WeTransfer, Dropbox)",
+      "grupo": "p3",
+      "o": 51
+    },
+    "srv_email_bad": {
+      "es": "Escríbelo completo, con arroba y dominio: nombre@correo.com",
+      "en": "That doesn't look like an email address.",
+      "grupo": "p1",
+      "o": 52
+    },
+    "q_missing_many": {
+      "es": "Faltan {n} respuestas",
+      "en": "{n} answers to go",
+      "grupo": "p6",
+      "o": 53
+    },
+    "avq_s3_cad_t": {
+      "es": "Súbenos plantas, alzados y secciones",
+      "en": "Upload plans, elevations and sections",
+      "grupo": "p3",
+      "o": 54
+    },
+    "avq_link_added": {
+      "es": "Enlace añadido",
+      "en": "Link added",
+      "grupo": "p3",
+      "o": 55
+    },
+    "avq_s3_model_t": {
+      "es": "Súbenos el modelo o pega el enlace de descarga",
+      "en": "Upload the model or paste the download link",
+      "grupo": "p3",
+      "o": 56
+    },
+    "qi_didyoumean": {
+      "es": "¿Quisiste decir <strong>{email}</strong>?",
+      "en": "Did you mean <strong>{email}</strong>?",
+      "grupo": "p1",
+      "o": 57
+    },
+    "srv_fix": {
+      "es": "Sí, corregir",
+      "en": "Yes, fix it",
+      "grupo": "p1",
+      "o": 58
+    },
+    "q_views_plan": {
+      "es": " con el plan {plan}",
+      "en": " on the {plan} plan",
+      "grupo": "p2",
+      "o": 59
+    },
+    "qi_plan_picked": {
+      "es": "Elegiste <strong>{plan}</strong>. Preparamos el estimado con esa base.",
+      "en": "You chose <strong>{plan}</strong>. We prepare the estimate on that basis.",
+      "grupo": "final",
+      "o": 60
+    },
+    "Paso 01 de 06": {
+      "es": "Paso 01 de 06",
+      "en": "Step 01 of 06",
+      "grupo": "cabecera",
+      "o": 61
+    },
+    "Continuar": {
+      "es": "Continuar",
+      "en": "Continue",
+      "grupo": "cabecera",
+      "o": 62
+    },
+    "Guardado": {
+      "es": "Guardado",
+      "en": "Saved",
+      "grupo": "p1",
+      "o": 63
+    },
+    "tu@correo.com": {
+      "es": "tu@correo.com",
+      "en": "you@email.com",
+      "grupo": "p1",
+      "o": 64
+    },
+    "¿A dónde te guardamos el avance?": {
+      "es": "¿A dónde te guardamos el avance?",
+      "en": "Where should we save your progress?",
+      "grupo": "p1",
+      "o": 65
+    },
+    "Lo guardamos en este navegador para que puedas volver donde quedaste. Te lo pedimos también para poder contactarte.": {
+      "es": "Lo guardamos en este navegador para que puedas volver donde quedaste. Te lo pedimos también para poder contactarte.",
+      "en": "We save it in this browser so you can come back where you left off. We also ask for it so we can contact you.",
+      "grupo": "p1",
+      "o": 66
+    },
+    "Paso 02 de 06": {
+      "es": "Paso 02 de 06",
+      "en": "Step 02 of 06",
+      "grupo": "p2",
+      "o": 67
+    },
+    "Vistas por escena": {
+      "es": "Vistas por escena",
+      "en": "Views per scene",
+      "grupo": "p2",
+      "o": 68
+    },
+    "escena": {
+      "es": "escena",
+      "en": "scene",
+      "grupo": "p2",
+      "o": 69
+    },
+    "escenas": {
+      "es": "escenas",
+      "en": "scenes",
+      "grupo": "p2",
+      "o": 70
+    },
+    "Paso 03 de 06": {
+      "es": "Paso 03 de 06",
+      "en": "Step 03 of 06",
+      "grupo": "p3",
+      "o": 71
+    },
+    "Paso 04 de 06": {
+      "es": "Paso 04 de 06",
+      "en": "Step 04 of 06",
+      "grupo": "p4",
+      "o": 72
+    },
+    "Paso 05 de 06": {
+      "es": "Paso 05 de 06",
+      "en": "Step 05 of 06",
+      "grupo": "p5",
+      "o": 73
+    },
+    "Se cotizan aparte. Lo que no marques aquí queda fuera del proyecto.": {
+      "es": "Se cotizan aparte. Lo que no marques aquí queda fuera del proyecto.",
+      "en": "These are quoted separately. Whatever you don't tick here stays out of the project.",
+      "grupo": "p5",
+      "o": 74
+    },
+    "Paso 06 de 06": {
+      "es": "Paso 06 de 06",
+      "en": "Step 06 of 06",
+      "grupo": "p6",
+      "o": 75
+    },
+    "Nombre completo": {
+      "es": "Nombre completo",
+      "en": "Full name",
+      "grupo": "p6",
+      "o": 76
+    },
+    "Correo": {
+      "es": "Correo",
+      "en": "Email",
+      "grupo": "p6",
+      "o": 77
+    },
+    "Teléfono": {
+      "es": "Teléfono",
+      "en": "Phone",
+      "grupo": "p6",
+      "o": 78
+    },
+    "Tus datos": {
+      "es": "Tus datos",
+      "en": "Your details",
+      "grupo": "p6",
+      "o": 79
+    },
+    "Nombre legal de la empresa": {
+      "es": "Nombre legal de la empresa",
+      "en": "Company's legal name",
+      "grupo": "p6",
+      "o": 80
+    },
+    "Estado o país de registro": {
+      "es": "Estado o país de registro",
+      "en": "State or country of registration",
+      "grupo": "p6",
+      "o": 81
+    },
+    "Quién firma": {
+      "es": "Quién firma",
+      "en": "Who signs",
+      "grupo": "p6",
+      "o": 82
+    },
+    "Su cargo": {
+      "es": "Su cargo",
+      "en": "Their title",
+      "grupo": "p6",
+      "o": 83
+    },
+    "¿Firmas a título personal o como empresa?": {
+      "es": "¿Firmas a título personal o como empresa?",
+      "en": "Are you signing personally or as a company?",
+      "grupo": "p6",
+      "o": 84
+    },
+    "Ciudad": {
+      "es": "Ciudad",
+      "en": "City",
+      "grupo": "p6",
+      "o": 85
+    },
+    "Menos de cuatro semanas: lo confirmamos en una llamada.": {
+      "es": "Menos de cuatro semanas: lo confirmamos en una llamada.",
+      "en": "Less than four weeks away: we'll confirm it on a call.",
+      "grupo": "p6",
+      "o": 86
+    },
+    "Enviar mi proyecto": {
+      "es": "Enviar mi proyecto",
+      "en": "Send my project",
+      "grupo": "p6",
+      "o": 87
+    },
+    "Listo": {
+      "es": "Listo",
+      "en": "Done",
+      "grupo": "final",
+      "o": 88
+    },
+    "Recomendado": {
+      "es": "Recomendado",
+      "en": "Recommended",
+      "grupo": "final",
+      "o": 89
+    },
+    "Ninguno": {
+      "es": "Ninguno",
+      "en": "None",
+      "grupo": "final",
+      "o": 90
+    },
+    "Plan": {
+      "es": "Plan",
+      "en": "Plan",
+      "grupo": "final",
+      "o": 91
+    },
+    "Tipo de proyecto": {
+      "es": "Tipo de proyecto",
+      "en": "Project type",
+      "grupo": "final",
+      "o": 92
+    },
+    "Etapa": {
+      "es": "Etapa",
+      "en": "Stage",
+      "grupo": "final",
+      "o": 93
+    },
+    "Escenas": {
+      "es": "Escenas",
+      "en": "Scenes",
+      "grupo": "final",
+      "o": 94
+    },
+    "Contexto urbano": {
+      "es": "Contexto urbano",
+      "en": "Urban context",
+      "grupo": "final",
+      "o": 95
+    },
+    "Marcado": {
+      "es": "Marcado",
+      "en": "Flagged",
+      "grupo": "final",
+      "o": 96
+    },
+    "La pieza": {
+      "es": "La pieza",
+      "en": "The piece",
+      "grupo": "final",
+      "o": 97
+    },
+    "Material": {
+      "es": "Material",
+      "en": "Material",
+      "grupo": "final",
+      "o": 98
+    },
+    "Especificación": {
+      "es": "Especificación",
+      "en": "Specification",
+      "grupo": "final",
+      "o": 99
+    },
+    "Tono": {
+      "es": "Tono",
+      "en": "Tone",
+      "grupo": "final",
+      "o": 100
+    },
+    "Alrededor del proyecto": {
+      "es": "Alrededor del proyecto",
+      "en": "Around the project",
+      "grupo": "final",
+      "o": 101
+    },
+    "Lanzamiento": {
+      "es": "Lanzamiento",
+      "en": "Launch",
+      "grupo": "final",
+      "o": 102
+    },
+    "Portafolio": {
+      "es": "Portafolio",
+      "en": "Portfolio",
+      "grupo": "final",
+      "o": 103
+    },
+    "Elegir archivos": {
+      "es": "Elegir archivos",
+      "en": "Choose files",
+      "grupo": "p3",
+      "o": 104
+    },
+    "Modelos, planos, PDF o imágenes.": {
+      "es": "Modelos, planos, PDF o imágenes.",
+      "en": "Models, drawings, PDF or images.",
+      "grupo": "p3",
+      "o": 105
+    },
+    "Elegir": {
+      "es": "Elegir",
+      "en": "Choose",
+      "grupo": "p3",
+      "o": 106
+    },
+    "Los modelos 3D suelen ser grandes: si no cabe, pega un enlace de descarga.": {
+      "es": "Los modelos 3D suelen ser grandes: si no cabe, pega un enlace de descarga.",
+      "en": "3D models tend to be big: if it doesn't fit, paste a download link.",
+      "grupo": "p3",
+      "o": 107
+    },
+    "enlace": {
+      "es": "enlace",
+      "en": "link",
+      "grupo": "final",
+      "o": 108
+    },
+    "Te escribimos en persona en menos de 48 horas": {
+      "es": "Te escribimos en persona en menos de 48 horas",
+      "en": "A person from the studio writes to you within 48 hours",
+      "grupo": "final",
+      "o": 109
+    }
+  }
+} as Config,
 };
