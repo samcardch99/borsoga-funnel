@@ -11,6 +11,8 @@
  * para que quien atienda el lead sepa qué mirar antes de escribir.
  */
 
+import { filasNota, type Esquema } from "./_esquema.js";
+
 type A = Record<string, any>;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -171,10 +173,27 @@ export function flags(a: A, service: string): string[] {
 export const resumenLinea = (a: A) =>
   [a.company, a.category].filter(Boolean).join(" · ").slice(0, 80);
 
-export function noteBody(a: A, service: string, plan: string, rt: string[], files: any[]) {
+export function noteBody(a: A, service: string, plan: string, rt: string[], files: any[],
+                         esquema: Esquema | null = null, aviso: string | null = null) {
   const row = (k: string, v: any) => (v ? `- **${k}:** ${v}\n` : "");
   const lista = (v: any) => (Array.isArray(v) ? v.join(", ") : v);
   const fl = flags(a, service);
+  if (aviso) fl.push(`No se pudo leer el cuestionario (${aviso}): la nota lista las respuestas en bruto.`);
+  // Con el esquema del panel, la nota sale de él: cada pregunta visible con su
+  // respuesta, incluidas las que se añadan mañana sin tocar este archivo.
+  if (esquema || aviso) {
+    const filas = esquema
+      ? filasNota(esquema, a)
+      : Object.entries(a).filter(([k, v]) => !["contactName", "name", "email", "phone", "privacy", "plan"].includes(k) && v && (typeof v !== "object" || Array.isArray(v)))
+          .map(([k, v]) => [k, lista(v)] as [string, string]);
+    return [
+      `**${rt[1]}**${plan && plan !== "—" ? ` · Desde: **${plan}**` : ""}\n\n`,
+      ...filas.map(([k, v]) => row(k, v)),
+      files.length ? `\n**Archivos:**\n${files.map((f: any) => `- ${f.kind}: ${f.url}`).join("\n")}\n` : "",
+      fl.length ? `\n**Señales:**\n${fl.map((x) => `- ${x}`).join("\n")}\n` : "",
+      `\n_${rt[2]}_`,
+    ].join("");
+  }
   const comun = [
     `**${rt[1]}**${plan && plan !== "—" ? ` · Desde: **${plan}**` : ""}\n\n`,
     row("Marca", a.company),

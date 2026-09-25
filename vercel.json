@@ -29,13 +29,36 @@
           "value": "public, max-age=31536000, immutable"
         }
       ]
+    },
+    {
+      "source": "/admin/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-src https://borsogastudio.com http://localhost:4321; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
+      ]
     }
   ],
   "redirects": [
     {
       "source": "/",
       "destination": "https://borsogastudio.com/plans/es/",
-      "permanent": true
+      "permanent": true,
+      "missing": [
+        {
+          "type": "host",
+          "value": "admin.borsogastudio.com"
+        }
+      ]
     },
     {
       "source": "/en",
@@ -236,6 +259,26 @@
       "source": "/visualizacion/",
       "destination": "https://borsogastudio.com/plans/es/interior-design/",
       "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "admin.borsogastudio.com"
+        }
+      ],
+      "destination": "/admin/"
+    },
+    {
+      "source": "/api/forms/:servicio/",
+      "destination": "/api/forms?servicio=:servicio"
+    },
+    {
+      "source": "/api/admin/:op/",
+      "destination": "/api/admin?op=:op"
     }
   ]
 }

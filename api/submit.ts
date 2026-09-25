@@ -186,9 +186,32 @@ export default async function handler(req: any, res: any) {
   const clientDerived: any = payload.derived || {};
   const uploads: UploadRef[] = Array.isArray(payload.files) ? payload.files.slice(0, MAX_FILES) : [];
 
+  // Los cuestionarios largos se editan en el panel y se publican por versiones.
+  // El envío dice con cuál se rellenó y se valida contra esa misma, no contra
+  // la última: la página puede llevar días en la caché del CDN. Sin versión, es
+  // una página anterior al panel y valen las reglas de siempre (_brief.ts).
+  const versionEsquema = BRIEF ? Math.floor(Number(payload.version)) || 0 : 0;
+  let ESQUEMA: import("./_esquema.js").Esquema | null = null;
+  let esquemaError: string | null = null;
+  if (versionEsquema) {
+    try {
+      ESQUEMA = await (await import("./_forms.js")).version(service as "web" | "grafico", versionEsquema);
+      if (!ESQUEMA) esquemaError = `versión ${versionEsquema} desconocida`;
+    } catch (e: any) {
+      esquemaError = e?.message || "no se pudo leer el esquema";
+    }
+    // Si no se puede leer la versión, mejor un lead con los datos de contacto
+    // validados que rechazar a alguien por un fallo nuestro.
+    if (esquemaError) console.warn("submit: esquema", service, esquemaError);
+  }
+  const { validarRespuestas } = versionEsquema ? await import("./_esquema.js") : { validarRespuestas: null };
+
   // El formulario de la portada es una consulta corta, no un cuestionario:
   // valida solo lo que necesita para poder responder.
-  const bad = BRIEF ? BRIEF.validate(a, service, uploads)
+  const bad = BRIEF
+    ? (versionEsquema
+        ? validarRespuestas!(ESQUEMA || ({ pasos: [] } as any), a, uploads)
+        : BRIEF.validate(a, service, uploads))
     : ES_CONTACTO ? validarContacto(a) : (AV ? AV.validate(a) : validate(a));
   // Al bot le devolvemos ok: si le decimos que lo pillamos, prueba otra cosa.
   if (bad === "bot") {
@@ -300,7 +323,8 @@ export default async function handler(req: any, res: any) {
   // lead ya está guardado y el correo sale igual: nunca tumba el envío.
   const { pushToTwenty } = await import("./_twenty.js");
   const crm = await pushToTwenty(a, clientDerived, plan, rt, files, service,
-                                 BRIEF ? BRIEF.noteBody(a, service, plan, rt, files)
+                                 BRIEF ? BRIEF.noteBody(a, service, plan, rt, files, ESQUEMA,
+                                                        esquemaError ? `v${versionEsquema}: ${esquemaError}` : null)
                                        : AV ? AV.noteBody(a, picked, rt, files) : null,
                                  BRIEF ? BRIEF.resumenLinea(a)
                                        : AV ? AV.sceneSummary(a) : null);
@@ -334,7 +358,7 @@ export default async function handler(req: any, res: any) {
     const line = (k: string, v: any) => (v ? `<tr><td style="padding:4px 14px 4px 0;color:#666">${k}</td><td>${String(v)}</td></tr>` : "");
     const body = `<div style="font-family:system-ui,sans-serif;font-size:14px;line-height:1.5">
 <h2 style="margin:0 0 4px">${rt[1]} · ${plan}</h2>
-<p style="margin:0 0 16px;color:#666">Servicio: <strong>${service}</strong> · Ruta: <strong>${rt[0]}</strong>${(BRIEF ? BRIEF.flags(a, service) : AV ? AV.flags(a) : []).map((f: string) => `<br>⚠ ${f}`).join("")}${mismatch ? ` · ⚠ discrepancia: ${mismatch}` : ""}${(!BRIEF && !ES_CONTACTO && structuralFlag(a)) ? " · ⚠ obra estructural" : ""}</p>
+<p style="margin:0 0 16px;color:#666">Servicio: <strong>${service}</strong>${versionEsquema ? ` · Cuestionario v${versionEsquema}${esquemaError ? ` (⚠ ${esquemaError})` : ""}` : ""} · Ruta: <strong>${rt[0]}</strong>${(BRIEF ? BRIEF.flags(a, service) : AV ? AV.flags(a) : []).map((f: string) => `<br>⚠ ${f}`).join("")}${mismatch ? ` · ⚠ discrepancia: ${mismatch}` : ""}${(!BRIEF && !ES_CONTACTO && structuralFlag(a)) ? " · ⚠ obra estructural" : ""}</p>
 <table style="border-collapse:collapse">
 ${line("Nombre", a.name)}${line("Correo", a.email)}${line("Teléfono", a.phone)}
 ${BRIEF ? `

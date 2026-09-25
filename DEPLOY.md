@@ -179,3 +179,30 @@ que aplicarlo en los dos sitios: ya nos mordió una vez con el texto de la ruta.
 - Fotos de nivel de acabado (paso 4): en blanco a propósito.
 - La política de privacidad es un borrador: revisar con abogado en Florida.
 - El sitio viejo sigue en el hosting compartido de Hostinger; se puede vaciar.
+
+## Panel de administración (admin.borsogastudio.com)
+
+Edita los cuestionarios de diseño web e identidad de marca y los publica.
+
+- **Interfaz:** `admin/` (HTML + JS sin dependencias), servida en `/admin/`; el
+  host `admin.borsogastudio.com` reescribe `/` a `/admin/` (vercel.json).
+- **API:** `api/admin.ts` (`/api/admin/<op>/`), sesión en `api/_sesion.ts`.
+- **Datos:** tablas `forms` (borrador) y `form_versions` (versiones publicadas,
+  inmutables) en el mismo Postgres que los leads. La primera lectura las crea y
+  guarda como versión 1 los esquemas de `api/_semillas.ts`.
+- **Público:** `GET /api/forms/<web|grafico>/` lo lee la compilación de
+  borsogastudio.com. Publicar en el panel lanza `deploy.yml` de borsoga-studio.
+- **Validación:** cada envío trae `version`; `submit.ts` valida contra esa
+  versión (`_esquema.ts`). Sin `version` (páginas anteriores al panel) siguen
+  valiendo las reglas de `_brief.ts`.
+- **Opciones fijas:** las que compara el servidor (`_brief.ts`: REGLAS, flags)
+  van marcadas `fija` en el esquema; el panel no deja quitarlas ni renombrarlas.
+
+Variables de entorno (Production):
+
+| Variable | Qué es |
+|---|---|
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Cliente OAuth «Panel admin» del proyecto de Google Cloud `borsoga-admin` (cuenta samcard1999@gmail.com) |
+| `ADMIN_EMAILS` | Correos con acceso, separados por comas. Mientras la app de Google esté en modo «Prueba», añádelos también como usuarios de prueba en Google Auth Platform → Público |
+| `ADMIN_SESSION_SECRET` | 32+ caracteres aleatorios (`openssl rand -hex 32`) |
+| `GITHUB_DEPLOY_TOKEN` | Token fine-grained de samcardch99, solo repo `borsoga-studio`, permiso **Actions: read and write** |

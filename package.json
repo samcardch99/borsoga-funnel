@@ -14,6 +14,6 @@
   },
   "scripts": {
     "bundle": "esbuild src/upload-client.js --bundle --minify --format=iife --target=es2020 --outfile=build/assets/upload.js",
-    "build": "python3 src/build.py && npm run bundle"
+    "build": "python3 src/build.py && npm run bundle && cp -R admin build/admin"
   }
 }
